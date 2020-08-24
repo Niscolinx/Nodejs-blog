@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
 import Post from '../../components/Feed/Post/Post';
+import imageUrl from '../../images/me.jpeg'
 import Button from '../../components/Button/Button';
 import FeedEdit from '../../components/Feed/FeedEdit/FeedEdit';
 import Input from '../../components/Form/Input/Input';
@@ -249,7 +250,7 @@ class Feed extends Component {
                             'en-US'
                         )}
                         title={post.title}
-                        image= '../../../images/me.jpeg'
+                        image= {imageUrl}
                         content={post.content}
                         onStartEdit={this.startEditPostHandler.bind(
                             this,
