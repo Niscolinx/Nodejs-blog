@@ -13,7 +13,7 @@ exports.getPosts = (req, res, next) => {
                 creator: {
                     name: 'Igboanugwo Collins',
                 },
-                imageUrl: '/backend/images/me.jpeg',
+                imageUrl: '../../../../backend/images/me.jpeg',
                 createdAt: new Date(),
             }
             res.status(200).json({

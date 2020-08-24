@@ -240,19 +240,23 @@ class Feed extends Component {
             >
               {this.state.posts.map(post => {
                 console.log('the image url is', post.imageUrl)
-                return(
-                  <Post
-                    key={post._id}
-                    id={post._id}
-                    author={post.creator.name}
-                    date={new Date(post.createdAt).toLocaleDateString('en-US')}
-                    title={post.title}
-                    image={post.imageUrl}
-                    content={post.content}
-                    onStartEdit={this.startEditPostHandler.bind(this, post._id)}
-                    onDelete={this.deletePostHandler.bind(this, post._id)}
-                  />
-
+                return (
+                    <Post
+                        key={post._id}
+                        id={post._id}
+                        author={post.creator.name}
+                        date={new Date(post.createdAt).toLocaleDateString(
+                            'en-US'
+                        )}
+                        title={post.title}
+                        image= '../../../images/me.jpeg'
+                        content={post.content}
+                        onStartEdit={this.startEditPostHandler.bind(
+                            this,
+                            post._id
+                        )}
+                        onDelete={this.deletePostHandler.bind(this, post._id)}
+                    />
                 )
 })}
             </Paginator>
