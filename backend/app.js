@@ -59,7 +59,7 @@ mongoose
         { useUnifiedTopology: true, useNewUrlParser: true }
     )
     .then((result) => {
-        console.log('Connected!!', result)
+        console.log('Connected!!')
         app.listen(3030)
     })
     .catch((err) => console.log(err))

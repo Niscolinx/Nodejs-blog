@@ -22,17 +22,18 @@ class Feed extends Component {
   };
 
   componentDidMount() {
-    fetch('URL')
-      .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch user status.');
-        }
-        return res.json();
-      })
-      .then(resData => {
-        this.setState({ status: resData.status });
-      })
-      .catch(this.catchError);
+    fetch('http://localhost:3030/feed/posts')
+        .then((res) => {
+            if (res.status !== 200) {
+                throw new Error('Failed to fetch user status.')
+            }
+            return res.json()
+        })
+        .then((resData) => {
+            console.log(resData)
+            this.setState({ status: resData.status })
+        })
+        .catch(this.catchError)
 
     this.loadPosts();
   }
@@ -50,21 +51,22 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    fetch('URL')
-      .then(res => {
-        if (res.status !== 200) {
-          throw new Error('Failed to fetch posts.');
-        }
-        return res.json();
-      })
-      .then(resData => {
-        this.setState({
-          posts: resData.posts,
-          totalPosts: resData.totalItems,
-          postsLoading: false
-        });
-      })
-      .catch(this.catchError);
+    fetch('http://localhost:3030/feed/posts')
+        .then((res) => {
+            if (res.status !== 200) {
+                throw new Error('Failed to fetch posts.')
+            }
+            return res.json()
+        })
+        .then((resData) => {
+          console.log(resData)
+            this.setState({
+                posts: resData.posts,
+                totalPosts: resData.totalItems,
+                postsLoading: false,
+            })
+        })
+        .catch(this.catchError)
   };
 
   statusUpdateHandler = event => {
@@ -106,7 +108,7 @@ class Feed extends Component {
       editLoading: true
     });
     // Set up data (with image!)
-    let url = 'URL';
+    let url = 'http://localhost:3030/feed/posts'
     if (this.state.editPost) {
       url = 'URL';
     }
@@ -119,6 +121,7 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        console.log(resData)
         const post = {
           _id: resData.post._id,
           title: resData.post.title,
@@ -235,19 +238,23 @@ class Feed extends Component {
               lastPage={Math.ceil(this.state.totalPosts / 2)}
               currentPage={this.state.postPage}
             >
-              {this.state.posts.map(post => (
-                <Post
-                  key={post._id}
-                  id={post._id}
-                  author={post.creator.name}
-                  date={new Date(post.createdAt).toLocaleDateString('en-US')}
-                  title={post.title}
-                  image={post.imageUrl}
-                  content={post.content}
-                  onStartEdit={this.startEditPostHandler.bind(this, post._id)}
-                  onDelete={this.deletePostHandler.bind(this, post._id)}
-                />
-              ))}
+              {this.state.posts.map(post => {
+                console.log('the image url is', post.imageUrl)
+                return(
+                  <Post
+                    key={post._id}
+                    id={post._id}
+                    author={post.creator.name}
+                    date={new Date(post.createdAt).toLocaleDateString('en-US')}
+                    title={post.title}
+                    image={post.imageUrl}
+                    content={post.content}
+                    onStartEdit={this.startEditPostHandler.bind(this, post._id)}
+                    onDelete={this.deletePostHandler.bind(this, post._id)}
+                  />
+
+                )
+})}
             </Paginator>
           )}
         </section>
