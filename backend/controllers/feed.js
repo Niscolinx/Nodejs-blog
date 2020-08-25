@@ -121,11 +121,14 @@ exports.getPost = (req, res, next) => {
 
 exports.deletePost = (req, res, next) => {
     const postId = req.params.postId
+    console.log('delete product', postId)
 
     Post.findById(postId)
         .then((product) => {
             console.log(product)
-            let imageUrl = product.imageUrl
+            if (product.imageUrl) {
+                let imageUrl = product.imageUrl
+            }
             //Do some authorization
             Post.findOneAndDelete(postId).then((deletedProduct) => {
                 console.log('deleted')
