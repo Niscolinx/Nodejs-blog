@@ -3,22 +3,26 @@ const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
 const fileDelete = require('../utility/deleteFile')
 
-const MAX_PRODUCT_TO_DISPLAY = 2
+const MAX_PRODUCT_TO_DISPLAY = 1
 
 exports.getPosts = (req, res, next) => {
-    console.log('Getting query', req.query.page)
-    const page = req.query.page
-
-    Post.find().countDocuments().then(totalProducts => {
-        console.log('the total producs is ', totalProducts)
-    })
-
+    const page = req.query.page || 1
+    let totalItems;
 
     Post.find()
+        .countDocuments()
+        .then((totalProducts) => {
+            totalItems = totalProducts
+            return Post.find()
+                .skip((page - 1) * MAX_PRODUCT_TO_DISPLAY)
+                .limit(MAX_PRODUCT_TO_DISPLAY)
+        })
         .then((posts) => {
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
+                totalItems,
+                lastPage: MAX_PRODUCT_TO_DISPLAY
             })
         })
         .catch((err) => {
@@ -93,8 +97,7 @@ exports.editPost = (req, res, next) => {
             return foundPost.save()
         })
         .then((result) => {
-
-            if(oldImage){
+            if (oldImage) {
                 fileDelete.deleteFile(oldImage)
             }
             res.status(201).json({
@@ -143,7 +146,7 @@ exports.deletePost = (req, res, next) => {
                 if (imageUrl) {
                     fileDelete.deleteFile(imageUrl)
                 }
-                res.json({message: 'Deleted'})
+                res.json({ message: 'Deleted' })
             })
         })
         .catch((err) => {
