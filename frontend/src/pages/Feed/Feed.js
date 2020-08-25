@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
 import Post from '../../components/Feed/Post/Post';
-import imageUrl from '../../images/me.jpeg'
 import Button from '../../components/Button/Button';
 import FeedEdit from '../../components/Feed/FeedEdit/FeedEdit';
 import Input from '../../components/Form/Input/Input';
@@ -105,8 +104,6 @@ class Feed extends Component {
   };
 
   finishEditHandler = postData => {
-
-    console.log('the post data', postData)
 
     const formData = new FormData()
     formData.append('title', postData.title)
@@ -263,7 +260,7 @@ class Feed extends Component {
                             'en-US'
                         )}
                         title={post.title}
-                        image= {imageUrl}
+                        image= {'http://localhost:3030/' + post.imageUrl}
                         content={post.content}
                         onStartEdit={this.startEditPostHandler.bind(
                             this,

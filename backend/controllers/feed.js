@@ -5,7 +5,7 @@ const Post = require('../models/post')
 exports.getPosts = (req, res, next) => {
     Post.find()
         .then((posts) => {
-          
+          console.log('the posts', posts)
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
