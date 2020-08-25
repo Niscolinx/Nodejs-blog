@@ -104,7 +104,6 @@ class Feed extends Component {
   };
 
   finishEditHandler = postData => {
-
     const formData = new FormData()
     formData.append('title', postData.title)
     formData.append('content', postData.content)
@@ -117,7 +116,7 @@ class Feed extends Component {
     let url = 'http://localhost:3030/feed/post'
     let method = 'POST'
     if (this.state.editPost) {
-      url = 'URL';
+      url = 'http://localhost:3030/feed/post';
       method = 'PUT'
     }
 
@@ -250,7 +249,7 @@ class Feed extends Component {
               currentPage={this.state.postPage}
             >
               {this.state.posts.map(post => {
-                console.log('the image url is', post.imageUrl, post)
+              
                 return (
                     <Post
                         key={post._id}
