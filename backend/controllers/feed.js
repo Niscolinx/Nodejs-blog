@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator/check')
 
 const Post = require('../models/post')
+const {deleteFile} = require('../utility/deleteFile')
 
 exports.getPosts = (req, res, next) => {
     Post.find()
@@ -53,9 +54,10 @@ exports.createPost = (req, res, next) => {
             }
             next(err)
         })
-    }
-    exports.editPost = (req, res, next) => {
-        console.log('Reached the edit post')
+}
+exports.editPost = (req, res, next) => {
+    const postId = req.params.postId
+    console.log('the post', postId)
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         const error = new Error('Validation failed, entered data is incorrect.')
@@ -63,21 +65,28 @@ exports.createPost = (req, res, next) => {
         error.errorMessage = errors.array()[0].msg
         throw error
     }
-    if (!req.file) {
-        const error = new Error('No image provided.')
-        error.statusCode = 422
-        throw error
-    }
-    const imageUrl = req.file.path
-    const title = req.body.title
-    const content = req.body.content
 
-    Post.findById(postId).then(res => {
-        console.log(res)
-    })
-   
-    post.save()
+    let oldImage;
+    Post.findById(postId)
+        .then((foundPost) => {
+            console.log(foundPost)
+            const { title, content } = req.body
+
+            let imageUrl = foundPost.imageUrl
+            if (req.file) {
+                imageUrl = req.file.path
+                 oldImage = foundPost.imageUrl
+            }
+
+            ;(foundPost.title = title),
+                (foundPost.content = content),
+                (foundPost.imageUrl = imageUrl)
+
+            return foundPost.save()
+        })
         .then((result) => {
+            console.log('the result of post', result)
+            deleteFile(oldImage)
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: result,

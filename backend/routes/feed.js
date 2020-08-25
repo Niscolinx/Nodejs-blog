@@ -23,7 +23,7 @@ router.post(
 );
 
 router.put(
-  '/post',
+  '/post/:postId',
   [
     body('title')
       .trim()
