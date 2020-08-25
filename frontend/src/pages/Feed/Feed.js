@@ -94,7 +94,8 @@ class Feed extends Component {
 
       return {
         isEditing: true,
-        editPost: loadedPost
+        editPost: loadedPost,
+        postId
       };
     });
   };
@@ -115,11 +116,8 @@ class Feed extends Component {
     // Set up data (with image!)
     let url = 'http://localhost:3030/feed/post'
     let method = 'POST'
-    let query = this.props
     if (this.state.editPost) {
-      console.log('the query', query)
-      
-      url = 'http://localhost:3030/feed/post';
+      url = 'http://localhost:3030/feed/post/' + this.state.postId;
       method = 'PUT'
 
     }

@@ -53,8 +53,9 @@ exports.createPost = (req, res, next) => {
             }
             next(err)
         })
-}
-exports.editPost = (req, res, next) => {
+    }
+    exports.editPost = (req, res, next) => {
+        console.log('Reached the edit post')
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         const error = new Error('Validation failed, entered data is incorrect.')
@@ -70,12 +71,11 @@ exports.editPost = (req, res, next) => {
     const imageUrl = req.file.path
     const title = req.body.title
     const content = req.body.content
-    const post = new Post({
-        title,
-        content,
-        imageUrl,
-        creator: { name: 'Collins' },
+
+    Post.findById(postId).then(res => {
+        console.log(res)
     })
+   
     post.save()
         .then((result) => {
             res.status(201).json({
@@ -92,7 +92,6 @@ exports.editPost = (req, res, next) => {
 }
 
 exports.getPost = (req, res, next) => {
-    console.log('Reached the single post')
     const postId = req.params.postId
     Post.findById(postId)
         .then((post) => {
