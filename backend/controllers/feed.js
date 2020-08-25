@@ -66,7 +66,7 @@ exports.editPost = (req, res, next) => {
         throw error
     }
 
-    let oldImage;
+    let oldImage
     Post.findById(postId)
         .then((foundPost) => {
             console.log(foundPost)
@@ -75,7 +75,7 @@ exports.editPost = (req, res, next) => {
             let imageUrl = foundPost.imageUrl
             if (req.file) {
                 imageUrl = req.file.path
-                 oldImage = foundPost.imageUrl
+                oldImage = foundPost.imageUrl
             }
 
             ;(foundPost.title = title),
@@ -110,6 +110,27 @@ exports.getPost = (req, res, next) => {
                 throw error
             }
             res.status(200).json({ message: 'Post fetched.', post })
+        })
+        .catch((err) => {
+            if (!err.statusCode) {
+                err.statusCode = 500
+            }
+            next(err)
+        })
+}
+
+exports.deletePost = (req, res, next) => {
+    const postId = req.params.postId
+
+    Post.findById(postId)
+        .then((product) => {
+            console.log(product)
+            let imageUrl = product.imageUrl
+            //Do some authorization
+            Post.findOneAndDelete(postId).then((deletedProduct) => {
+                console.log('deleted')
+                fileDelete.deleteFile(imageUrl)
+            })
         })
         .catch((err) => {
             if (!err.statusCode) {
