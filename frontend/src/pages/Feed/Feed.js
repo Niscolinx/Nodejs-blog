@@ -115,9 +115,13 @@ class Feed extends Component {
     // Set up data (with image!)
     let url = 'http://localhost:3030/feed/post'
     let method = 'POST'
+    let query = this.props
     if (this.state.editPost) {
+      console.log('the query', query)
+      
       url = 'http://localhost:3030/feed/post';
       method = 'PUT'
+
     }
 
     fetch(url, {
@@ -131,7 +135,6 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData)
         const post = {
           _id: resData.post._id,
           title: resData.post.title,

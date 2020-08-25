@@ -3,7 +3,6 @@ import React from 'react'
 import './Image.css'
 
 const image = (props) => {
-  console.log('the image', props.imageUrl)
     return (
         <div
             className='image'
