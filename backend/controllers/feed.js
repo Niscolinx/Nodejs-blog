@@ -126,13 +126,16 @@ exports.deletePost = (req, res, next) => {
     Post.findById(postId)
         .then((product) => {
             console.log(product)
+            let imageUrl
             if (product.imageUrl) {
-                let imageUrl = product.imageUrl
+                imageUrl = product.imageUrl
             }
             //Do some authorization
             Post.findOneAndDelete(postId).then((deletedProduct) => {
                 console.log('deleted')
-                fileDelete.deleteFile(imageUrl)
+                if (imageUrl) {
+                    fileDelete.deleteFile(imageUrl)
+                }
             })
         })
         .catch((err) => {
