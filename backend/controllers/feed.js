@@ -4,6 +4,7 @@ const Post = require('../models/post')
 const fileDelete = require('../utility/deleteFile')
 
 exports.getPosts = (req, res, next) => {
+    console.log('Getting query', req.query.page)
     Post.find()
         .then((posts) => {
             res.status(200).json({
@@ -57,7 +58,6 @@ exports.createPost = (req, res, next) => {
 }
 exports.editPost = (req, res, next) => {
     const postId = req.params.postId
-    console.log('the post', postId)
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         const error = new Error('Validation failed, entered data is incorrect.')
@@ -69,7 +69,6 @@ exports.editPost = (req, res, next) => {
     let oldImage
     Post.findById(postId)
         .then((foundPost) => {
-            console.log(foundPost)
             const { title, content } = req.body
 
             let imageUrl = foundPost.imageUrl
@@ -85,8 +84,10 @@ exports.editPost = (req, res, next) => {
             return foundPost.save()
         })
         .then((result) => {
-            console.log('the result of post', result)
-            fileDelete.deleteFile(oldImage)
+
+            if(oldImage){
+                fileDelete.deleteFile(oldImage)
+            }
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: result,

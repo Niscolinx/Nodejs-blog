@@ -75,7 +75,7 @@ class Signup extends Component {
         <form onSubmit={e => this.props.onSignup(e, this.state)}>
           <Input
             id="email"
-            label="Your E-Mail"
+            label="E-Mail"
             type="email"
             control="input"
             onChange={this.inputChangeHandler}
@@ -86,7 +86,7 @@ class Signup extends Component {
           />
           <Input
             id="name"
-            label="Your Name"
+            label="Username"
             type="text"
             control="input"
             onChange={this.inputChangeHandler}
