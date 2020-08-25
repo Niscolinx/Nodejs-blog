@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator/check')
 
 const Post = require('../models/post')
-const deleteFile = require('../utility/deleteFile')
+const fileDelete = require('../utility/deleteFile')
 
 exports.getPosts = (req, res, next) => {
     Post.find()
@@ -86,7 +86,7 @@ exports.editPost = (req, res, next) => {
         })
         .then((result) => {
             console.log('the result of post', result)
-            deleteFile(oldImage)
+            fileDelete.deleteFile(oldImage)
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: result,
