@@ -105,16 +105,29 @@ class Feed extends Component {
   };
 
   finishEditHandler = postData => {
+
+    console.log('the post data', postData)
+
+    const formData = new FormData()
+    formData.append('title', postData.title)
+    formData.append('content', postData.content)
+    formData.append('image', postData.image)
+
     this.setState({
       editLoading: true
     });
     // Set up data (with image!)
-    let url = 'http://localhost:3030/feed/posts'
+    let url = 'http://localhost:3030/feed/post'
+    let method = 'POST'
     if (this.state.editPost) {
       url = 'URL';
+      method = 'PUT'
     }
 
-    fetch(url)
+    fetch(url, {
+      method,
+      body: formData
+    })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error('Creating or editing a post failed!');
@@ -240,7 +253,7 @@ class Feed extends Component {
               currentPage={this.state.postPage}
             >
               {this.state.posts.map(post => {
-                console.log('the image url is', post.imageUrl)
+                console.log('the image url is', post.imageUrl, post)
                 return (
                     <Post
                         key={post._id}
