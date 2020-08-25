@@ -3,8 +3,17 @@ const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
 const fileDelete = require('../utility/deleteFile')
 
+const MAX_PRODUCT_TO_DISPLAY = 2
+
 exports.getPosts = (req, res, next) => {
     console.log('Getting query', req.query.page)
+    const page = req.query.page
+
+    Post.find().countDocuments().then(totalProducts => {
+        console.log('the total producs is ', totalProducts)
+    })
+
+
     Post.find()
         .then((posts) => {
             res.status(200).json({
