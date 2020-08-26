@@ -9,7 +9,17 @@ const router = express.Router()
 router.post(
     '/signup',
     [
-        body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
+        body('email')
+            .isEmail()
+            .normalizeEmail()
+            .withMessage('Invalid email')
+            .custom((value, { req }) => {
+               return User.findOne({ email: value }).then((userDoc) => {
+                    if (userDoc) {
+                        return Promise.reject('User already exits')
+                    }
+                })
+            }),
         body('password').trim().isLength({ min: 5 }),
         body('username').trim().isLength({ min: 5 }),
     ],
@@ -21,17 +31,7 @@ router.post(
         body('email')
             .isEmail()
             .normalizeEmail()
-            .withMessage('Invalid email')
-            .custom((value, { req }) => {
-
-                User.find({email: value}).then(res => {
-                    console.log('from the validation', res)
-                })
-                .catch(err => {
-                    console.log('from validation error', err)
-                    return Promise.reject('User does not exist')
-                })
-            }),
+            .withMessage('Invalid email'),
         body('password').trim().isLength({ min: 5 }),
     ],
     userController.postLogin
