@@ -65,12 +65,11 @@ exports.postLogin = (req, res, next) => {
 
                     const token = jwt
                         .sign(
-                            { userId: user._id, email: user.email },
+                            { userId: user._id.toString(), email: user.email },
                             'supersecretkey',
                             { expiresIn: '1hr' }
                         )
-                    console.log('token', token)
-                    res.status(201).json({ message: 'Successful login', token, userId: user._id })
+                    res.status(201).json({ message: 'Successful login', token, userId: user._id.toString() })
                 })
             }
         })
