@@ -4,7 +4,6 @@ const User = require('../models/user')
 const bcrypt = require('bcryptjs')
 
 exports.postSignup = (req, res, next) => {
-
     const { email, password, username } = req.body
 
     const errors = validationResult(req)
@@ -29,7 +28,7 @@ exports.postSignup = (req, res, next) => {
         })
         .then((result) => {
             console.log(result)
-            res.json({ message: 'Successful signup' })
+            res.status(201).json({ message: 'Successful signup' })
         })
         .catch((err) => {
             next(err)
@@ -37,8 +36,7 @@ exports.postSignup = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
-
-    const { email, password, username } = req.body
+    const { email, password } = req.body
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -48,22 +46,24 @@ exports.postLogin = (req, res, next) => {
         throw error
     }
 
-    bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-            const user = new User({
-                email,
-                username,
-                password: hashedPassword,
-                status: 'New user',
-            })
+    User.find({ email })
+        .then((user) => {
+            if (!user) {
+                const error = new Error('user validation failed')
+                error.statusCode = 422
+                throw error
+            }
 
-            return user.save()
+            bcrypt.compare(password, user.password).then((isEqual) => {
+                if (isEqual) {
+                    res.status(201).json({ message: 'Successful login' })
+                } else {
+                    res.status(403).json({ message: 'Password is incorrent' })
+                    throw new Error('Incorrect password')
+                }
+            })
         })
-        .then((result) => {
-            console.log(result)
-            res.json({ message: 'Successful signup' })
-        })
+
         .catch((err) => {
             next(err)
         })
