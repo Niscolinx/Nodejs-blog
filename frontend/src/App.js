@@ -57,7 +57,7 @@ class App extends Component {
   };
 
   loginHandler = (event, authData) => {
-    console.log('login data', authData)
+  
     event.preventDefault();
     this.setState({ authLoading: true });
      fetch('http://localhost:3030/auth/login', {

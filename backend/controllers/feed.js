@@ -1,13 +1,14 @@
 const { validationResult } = require('express-validator/check')
 
 const Post = require('../models/post')
+const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
 
 const MAX_PRODUCT_TO_DISPLAY = 1
 
 exports.getPosts = (req, res, next) => {
     const page = req.query.page || 1
-    let totalItems;
+    let totalItems
 
     Post.find()
         .countDocuments()
@@ -22,7 +23,7 @@ exports.getPosts = (req, res, next) => {
                 message: 'Fetched posts successfully.',
                 posts,
                 totalItems,
-                lastPage: MAX_PRODUCT_TO_DISPLAY
+                lastPage: MAX_PRODUCT_TO_DISPLAY,
             })
         })
         .catch((err) => {
@@ -49,14 +50,20 @@ exports.createPost = (req, res, next) => {
     const imageUrl = req.file.path
     const title = req.body.title
     const content = req.body.content
-    const post = new Post({
-        title,
-        content,
-        imageUrl,
-        creator: { name: 'Collins' },
-    })
-    post.save()
+
+    User.findById(req.userId)
+        .then((user) => {
+            console.log('the user', user)
+            const post = new Post({
+                title,
+                content,
+                imageUrl,
+                creator: { username: user.username, userId: user._id },
+            })
+            return post.save()
+        })
         .then((result) => {
+            console.log('the post', result)
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: result,
