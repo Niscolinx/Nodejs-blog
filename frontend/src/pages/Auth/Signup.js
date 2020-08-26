@@ -20,7 +20,7 @@ class Signup extends Component {
         touched: false,
         validators: [required, length({ min: 5 })]
       },
-      name: {
+      username: {
         value: '',
         valid: false,
         touched: false,
@@ -85,15 +85,15 @@ class Signup extends Component {
             touched={this.state.signupForm['email'].touched}
           />
           <Input
-            id="name"
+            id="username"
             label="Username"
             type="text"
             control="input"
             onChange={this.inputChangeHandler}
-            onBlur={this.inputBlurHandler.bind(this, 'name')}
-            value={this.state.signupForm['name'].value}
-            valid={this.state.signupForm['name'].valid}
-            touched={this.state.signupForm['name'].touched}
+            onBlur={this.inputBlurHandler.bind(this, 'username')}
+            value={this.state.signupForm['username'].value}
+            valid={this.state.signupForm['username'].valid}
+            touched={this.state.signupForm['username'].touched}
           />
           <Input
             id="password"
