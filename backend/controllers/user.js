@@ -48,23 +48,29 @@ exports.postLogin = (req, res, next) => {
 
     User.find({ email })
         .then((user) => {
+            console.log('the user', user)
             if (!user) {
-                const error = new Error('user validation failed')
-                error.statusCode = 422
-                throw error
+                res.json({ message: 'Invalid user' })
+                // const error = new Error('user validation failed')
+                // error.statusCode = 500
+                // throw error
+            } else {
+                bcrypt.compare(password, user.password).then((isEqual) => {
+                    console.log('the hash', isEqual)
+                    if (isEqual) {
+                        res.status(201).json({ message: 'Successful login' })
+                    } else {
+                        res.status(403).json({
+                            message: 'Password is incorrent',
+                        })
+                        // throw new Error('Incorrect password')
+                    }
+                })
             }
-
-            bcrypt.compare(password, user.password).then((isEqual) => {
-                if (isEqual) {
-                    res.status(201).json({ message: 'Successful login' })
-                } else {
-                    res.status(403).json({ message: 'Password is incorrent' })
-                    throw new Error('Incorrect password')
-                }
-            })
         })
 
         .catch((err) => {
+            console.log('the error', err)
             next(err)
         })
 }
