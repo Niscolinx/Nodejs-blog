@@ -22,6 +22,7 @@ class Feed extends Component {
     }
 
     componentDidMount() {
+        console.log('the token props', this.props.token)
         fetch('http://localhost:3030/feed/posts')
             .then((res) => {
                 if (res.status !== 200) {

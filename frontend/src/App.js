@@ -17,7 +17,7 @@ class App extends Component {
   state = {
     showBackdrop: false,
     showMobileNav: false,
-    isAuth: true,
+    isAuth: false,
     token: null,
     userId: null,
     authLoading: false,
@@ -26,6 +26,8 @@ class App extends Component {
 
   componentDidMount() {
     const token = localStorage.getItem('token');
+    console.log('the token from App', token)
+    console.log('the token from the set State', this.state.token)
     const expiryDate = localStorage.getItem('expiryDate');
     if (!token || !expiryDate) {
       return;

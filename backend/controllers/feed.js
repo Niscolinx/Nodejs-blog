@@ -3,7 +3,6 @@ const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
 const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
-const post = require('../models/post')
 
 const MAX_PRODUCT_TO_DISPLAY = 1
 
@@ -99,7 +98,6 @@ exports.editPost = (req, res, next) => {
     Post.findById(postId)
         .then((foundPost) => {
             const { title, content } = req.body
-            console.log('the product it update', foundPost)
 
             if (foundPost.creator._id.toString() !== req.userId) {
                 const error = new Error('Not authorized')
@@ -170,23 +168,19 @@ exports.deletePost = (req, res, next) => {
                 imageUrl = foundPost.imageUrl
             }
             if (imageUrl) {
-                console.log('the image url', imageUrl)
                 fileDelete.deleteFile(imageUrl)
             }
             //Do some authorization
             return Post.findOneAndDelete(postId)
         })
         .then((deletedpost) => {
-            console.log('deleted post', deletedpost)
 
             User.findById(deletedpost.creator).then((user) => {
-                console.log('the user', user)
-                console.log('the user posts', user.posts)
 
                 user.posts.pull(deletedpost._id)
                return user.save()
                     .then((result) => {
-                        console.log('the updated user', result)
+                        
                         res.json({ message: 'Deleted' })
                     })
                     .catch((err) => {
