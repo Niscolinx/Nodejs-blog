@@ -169,33 +169,37 @@ exports.deletePost = (req, res, next) => {
             if (foundPost.imageUrl) {
                 imageUrl = foundPost.imageUrl
             }
+            if (imageUrl) {
+                console.log('the image url', imageUrl)
+                fileDelete.deleteFile(imageUrl)
+            }
             //Do some authorization
-            Post.findOneAndDelete(postId).then((deletedpost) => {
-                console.log('deleted post', deletedpost)
-                if (imageUrl) {
-                    fileDelete.deleteFile(imageUrl)
-                }
-                User.find(deletedpost.creator).then((user) => {
-                    console.log('the user ', user)
-                    console.log('the deleted post ', deletedpost)
+            return Post.findOneAndDelete(postId)
+        })
+        .then((deletedpost) => {
+            console.log('deleted post', deletedpost)
 
-                    user.posts.filter((p) => {
-                        return p.toString() !== deletedpost._id.toString()
-                    })
-                    user.save()
-                        .then((res) => {
-                            console.log('the updated user', res)
-                            res.json({ message: 'Deleted' })
-                        })
-                        .catch((err) => {
-                            if (!err.statusCode) {
-                                err.statusCode = 500
-                            }
-                            next(err)
-                        })
+            User.findById(deletedpost.creator).then((user) => {
+                console.log('the user', user)
+                console.log('the user posts', user.posts)
+
+                user[0].posts.filter((p) => {
+                    return p.toString() !== deletedpost._id.toString()
                 })
+               return user.save()
+                    .then((res) => {
+                        console.log('the updated user', res)
+                        res.json({ message: 'Deleted' })
+                    })
+                    .catch((err) => {
+                        if (!err.statusCode) {
+                            err.statusCode = 500
+                        }
+                        next(err)
+                    })
             })
         })
+
         .catch((err) => {
             if (!err.statusCode) {
                 err.statusCode = 500
