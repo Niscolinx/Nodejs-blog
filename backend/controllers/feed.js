@@ -67,7 +67,7 @@ exports.createPost = (req, res, next) => {
             return User.findById(req.userId)
         })
         .then((user) => {
-            user.posts.push(user._id.toString())
+            user.posts.push(fetchedPost._id.toString())
 
             return user.save()
         })
@@ -75,7 +75,7 @@ exports.createPost = (req, res, next) => {
             res.status(201).json({
                 message: 'Post created successfully!',
                 posts: fetchedPost,
-                creator: {_id: userPost._id, username: userPost.username}
+                creator: { _id: userPost._id, username: userPost.username },
             })
         })
         .catch((err) => {
@@ -99,13 +99,13 @@ exports.editPost = (req, res, next) => {
     Post.findById(postId)
         .then((foundPost) => {
             const { title, content } = req.body
+            console.log('the product it update', foundPost)
 
-            if(foundPost.creator._id.toString() !== req.userId){
+            if (foundPost.creator._id.toString() !== req.userId) {
                 const error = new Error('Not authorized')
                 error.statusCode = 403
                 throw error
             }
-
 
             let imageUrl = foundPost.imageUrl
             if (req.file) {
@@ -125,7 +125,7 @@ exports.editPost = (req, res, next) => {
             }
             res.status(201).json({
                 message: 'Post Edited successfully!',
-                posts: result,                
+                posts: result,
             })
         })
         .catch((err) => {
@@ -160,7 +160,6 @@ exports.deletePost = (req, res, next) => {
 
     Post.findById(postId)
         .then((foundPost) => {
-
             if (foundPost.creator._id.toString() !== req.userId) {
                 const error = new Error('Not authorized')
                 error.statusCode = 403
@@ -171,11 +170,30 @@ exports.deletePost = (req, res, next) => {
                 imageUrl = foundPost.imageUrl
             }
             //Do some authorization
-            Post.findOneAndDelete(postId).then((deletedProduct) => {
+            Post.findOneAndDelete(postId).then((deletedpost) => {
+                console.log('deleted post', deletedpost)
                 if (imageUrl) {
                     fileDelete.deleteFile(imageUrl)
                 }
-                res.json({ message: 'Deleted' })
+                User.find(deletedpost.creator).then((user) => {
+                    console.log('the user ', user)
+                    console.log('the deleted post ', deletedpost)
+
+                    user.posts.filter((p) => {
+                        return p.toString() !== deletedpost._id.toString()
+                    })
+                    user.save()
+                        .then((res) => {
+                            console.log('the updated user', res)
+                            res.json({ message: 'Deleted' })
+                        })
+                        .catch((err) => {
+                            if (!err.statusCode) {
+                                err.statusCode = 500
+                            }
+                            next(err)
+                        })
+                })
             })
         })
         .catch((err) => {
