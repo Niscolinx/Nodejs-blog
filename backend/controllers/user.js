@@ -49,7 +49,6 @@ exports.postLogin = (req, res, next) => {
 
     User.findOne({ email })
         .then((user) => {
-            console.log('the user', user)
             if (!user) {
                 const error = new Error('user validation failed')
                 error.statusCode = 500
@@ -62,7 +61,8 @@ exports.postLogin = (req, res, next) => {
                         error.statusCode = 401
                         throw error
                     }
-
+                    
+                    console.log('the user', user)
                     const token = jwt
                         .sign(
                             { userId: user._id.toString(), email: user.email },

@@ -63,7 +63,7 @@ exports.createPost = (req, res, next) => {
             return post.save()
         })
         .then((result) => {
-            console.log('the post', result)
+            console.log('the post', result, req.userId)
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: result,
