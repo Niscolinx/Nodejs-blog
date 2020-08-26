@@ -183,12 +183,10 @@ exports.deletePost = (req, res, next) => {
                 console.log('the user', user)
                 console.log('the user posts', user.posts)
 
-                user[0].posts.filter((p) => {
-                    return p.toString() !== deletedpost._id.toString()
-                })
+                user.posts.pull(deletedpost._id)
                return user.save()
-                    .then((res) => {
-                        console.log('the updated user', res)
+                    .then((result) => {
+                        console.log('the updated user', result)
                         res.json({ message: 'Deleted' })
                     })
                     .catch((err) => {
