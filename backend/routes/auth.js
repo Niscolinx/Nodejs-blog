@@ -14,6 +14,14 @@ router.post(
     ],
     userController.postSignup
 )
+router.post(
+    '/login',
+    [
+        body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
+        body('password').trim().isLength({ min: 5 }),
+    ],
+    userController.postLogin
+)
 
 
 module.exports = router

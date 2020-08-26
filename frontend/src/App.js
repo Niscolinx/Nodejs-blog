@@ -57,63 +57,70 @@ class App extends Component {
   };
 
   loginHandler = (event, authData) => {
+    console.log('login data', authData)
     event.preventDefault();
     this.setState({ authLoading: true });
-    fetch('URL')
-      .then(res => {
-        if (res.status === 422) {
-          throw new Error('Validation failed.');
-        }
-        if (res.status !== 200 && res.status !== 201) {
-          console.log('Error!');
-          throw new Error('Could not authenticate you!');
-        }
-        return res.json();
-      })
-      .then(resData => {
-        console.log(resData);
-        this.setState({
-          isAuth: true,
-          token: resData.token,
-          authLoading: false,
-          userId: resData.userId
-        });
-        localStorage.setItem('token', resData.token);
-        localStorage.setItem('userId', resData.userId);
-        const remainingMilliseconds = 60 * 60 * 1000;
-        const expiryDate = new Date(
-          new Date().getTime() + remainingMilliseconds
-        );
-        localStorage.setItem('expiryDate', expiryDate.toISOString());
-        this.setAutoLogout(remainingMilliseconds);
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({
-          isAuth: false,
-          authLoading: false,
-          error: err
-        });
-      });
+     fetch('http://localhost:3030/auth/login', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+             email: authData.email,
+             password: authData.password,
+         }),
+     })
+         .then((res) => {
+             if (res.status === 422) {
+                 throw new Error('Validation failed.')
+             }
+             if (res.status !== 200 && res.status !== 201) {
+                 console.log('Error!')
+                 throw new Error('Could not authenticate you!')
+             }
+             return res.json()
+         })
+         .then((resData) => {
+             console.log(resData)
+             this.setState({
+                 isAuth: true,
+                 token: resData.token,
+                 authLoading: false,
+                 userId: resData.userId,
+             })
+             localStorage.setItem('token', resData.token)
+             localStorage.setItem('userId', resData.userId)
+             const remainingMilliseconds = 60 * 60 * 1000
+             const expiryDate = new Date(
+                 new Date().getTime() + remainingMilliseconds
+             )
+             localStorage.setItem('expiryDate', expiryDate.toISOString())
+             this.setAutoLogout(remainingMilliseconds)
+         })
+         .catch((err) => {
+             console.log(err)
+             this.setState({
+                 isAuth: false,
+                 authLoading: false,
+                 error: err,
+             })
+         })
   };
 
   signupHandler = (event, authData) => {
-    console.log('the auth data', authData)
     event.preventDefault();
     this.setState({ authLoading: true });
     fetch('http://localhost:3030/auth/signup', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: {
+      body: JSON.stringify({
         email: authData.signupForm.email.value,
         username: authData.signupForm.username.value,
         password: authData.signupForm.password.value
-      }
+      })
     })
       .then(res => {
         if (res.status === 422) {
           throw new Error(
-            "Validation failed. Make sure the email address isn't used yet!"
+            "Validation failed. Please make sure your input values are correct"
           );
         }
         if (res.status !== 200 && res.status !== 201) {
