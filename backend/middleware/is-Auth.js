@@ -27,7 +27,8 @@ module.exports = (req, res, next) => {
         error.statusCode = 403
         throw err
     }
-
+    
+    console.log('the authorised user', verifiedToken)
     req.userId = verifiedToken.userId
     next()
 }

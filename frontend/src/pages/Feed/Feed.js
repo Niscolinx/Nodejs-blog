@@ -30,7 +30,6 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the status', resData)
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -53,7 +52,7 @@ class Feed extends Component {
         }
         fetch('http://localhost:3030/feed/posts?page=' + page, {
             headers: {
-                Authorization: 'Bearer ' + this.props.token
+                Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
@@ -63,7 +62,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log(resData)
+                console.log('From the post', resData)
                 this.setState({
                     posts: resData.posts,
                     totalPosts: resData.totalItems,
@@ -132,7 +131,7 @@ class Feed extends Component {
             method,
             body: formData,
             headers: {
-                Authorization: 'Bearer ' + this.props.token
+                Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
@@ -143,11 +142,11 @@ class Feed extends Component {
             })
             .then((resData) => {
                 const post = {
-                    _id: resData.post._id,
-                    title: resData.post.title,
-                    content: resData.post.content,
-                    creator: resData.post.creator,
-                    createdAt: resData.post.createdAt,
+                    _id: resData.posts._id,
+                    title: resData.posts.title,
+                    content: resData.posts.content,
+                    creator: resData.posts.creator,
+                    createdAt: resData.posts.createdAt,
                 }
                 this.setState((prevState) => {
                     let updatedPosts = [...prevState.posts]
@@ -187,7 +186,7 @@ class Feed extends Component {
         fetch('http://localhost:3030/feed/post/' + postId, {
             method: 'DELETE',
             headers: {
-                Authorization: 'Bearer ' + this.props.token
+                Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
@@ -275,6 +274,7 @@ class Feed extends Component {
                             currentPage={this.state.postPage}
                         >
                             {this.state.posts.map((post) => {
+                                console.log('the fetched psots', post)
                                 return (
                                     <Post
                                         key={post._id}

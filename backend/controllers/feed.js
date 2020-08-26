@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator/check')
 const Post = require('../models/post')
 const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
+const post = require('../models/post')
 
 const MAX_PRODUCT_TO_DISPLAY = 1
 
@@ -19,6 +20,7 @@ exports.getPosts = (req, res, next) => {
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
+            console.log('the get posts', posts)
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
@@ -51,22 +53,29 @@ exports.createPost = (req, res, next) => {
     const title = req.body.title
     const content = req.body.content
 
-    User.findById(req.userId)
-        .then((user) => {
-            console.log('the user', user)
-            const post = new Post({
-                title,
-                content,
-                imageUrl,
-                creator: { username: user.username, userId: user._id },
-            })
-            return post.save()
+    let fetchedPost
+    const post = new Post({
+        title,
+        content,
+        imageUrl,
+        creator: req.userId,
+    })
+    return post
+        .save()
+        .then((post) => {
+            fetchedPost = post
+            return User.findById(req.userId)
         })
-        .then((result) => {
-            console.log('the post', result, req.userId)
+        .then((user) => {
+            user.posts.push(user._id.toString())
+
+            return user.save()
+        })
+        .then((userPost) => {
             res.status(201).json({
                 message: 'Post created successfully!',
-                post: result,
+                posts: fetchedPost,
+                creator: {_id: userPost._id, username: userPost.username}
             })
         })
         .catch((err) => {
@@ -91,6 +100,13 @@ exports.editPost = (req, res, next) => {
         .then((foundPost) => {
             const { title, content } = req.body
 
+            if(foundPost.creator._id.toString() !== req.userId){
+                const error = new Error('Not authorized')
+                error.statusCode = 403
+                throw error
+            }
+
+
             let imageUrl = foundPost.imageUrl
             if (req.file) {
                 imageUrl = req.file.path
@@ -108,8 +124,8 @@ exports.editPost = (req, res, next) => {
                 fileDelete.deleteFile(oldImage)
             }
             res.status(201).json({
-                message: 'Post created successfully!',
-                post: result,
+                message: 'Post Edited successfully!',
+                posts: result,                
             })
         })
         .catch((err) => {
@@ -143,10 +159,16 @@ exports.deletePost = (req, res, next) => {
     const postId = req.params.postId
 
     Post.findById(postId)
-        .then((product) => {
+        .then((foundPost) => {
+
+            if (foundPost.creator._id.toString() !== req.userId) {
+                const error = new Error('Not authorized')
+                error.statusCode = 403
+                throw error
+            }
             let imageUrl
-            if (product.imageUrl) {
-                imageUrl = product.imageUrl
+            if (foundPost.imageUrl) {
+                imageUrl = foundPost.imageUrl
             }
             //Do some authorization
             Post.findOneAndDelete(postId).then((deletedProduct) => {

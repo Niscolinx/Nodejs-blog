@@ -55,17 +55,16 @@ exports.postLogin = (req, res, next) => {
                 throw error
             } else {
                 bcrypt.compare(password, user.password).then((isEqual) => {
-                    console.log('the hash', isEqual)
                     if (!isEqual) {
                         const error = new Error('Incorrect password')
                         error.statusCode = 401
                         throw error
                     }
                     
-                    console.log('the user', user)
+                    console.log('the user in login', user._id.toString())
                     const token = jwt
                         .sign(
-                            { userId: user._id.toString(), email: user.email },
+                            {  email: user.email, userId: user._id.toString() },
                             'supersecretkey',
                             { expiresIn: '1hr' }
                         )
