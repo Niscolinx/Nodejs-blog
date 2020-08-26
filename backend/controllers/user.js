@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator/check')
 
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 exports.postSignup = (req, res, next) => {
     const { email, password, username } = req.body
@@ -57,12 +58,19 @@ exports.postLogin = (req, res, next) => {
                 bcrypt.compare(password, user.password).then((isEqual) => {
                     console.log('the hash', isEqual)
                     if (!isEqual) {
-                        res.status(403).json({message: 'Incorrect password'})
                         const error = new Error('Incorrect password')
-                        error.statusCode = 403
+                        error.statusCode = 401
                         throw error
                     }
-                    res.status(201).json({ message: 'Successful login' })
+
+                    const token = jwt
+                        .sign(
+                            { userId: user._id, email: user.email },
+                            'supersecretkey',
+                            { expiresIn: '1hr' }
+                        )
+                    console.log('token', token)
+                    res.status(201).json({ message: 'Successful login', token, userId: user._id })
                 })
             }
         })
