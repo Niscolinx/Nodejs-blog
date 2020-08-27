@@ -105,10 +105,11 @@ class Feed extends Component {
     statusUpdateHandler = (event) => {
         event.preventDefault()
         fetch('http://localhost:3030/feed/userStatus', {
-            method: 'PUT',
-            body: {
-                status: this.state.status,
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + this.props.token
             },
+            body: 'hellow'
         })
             .then((res) => {
                 console.log('from the status', res)

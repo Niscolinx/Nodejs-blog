@@ -28,7 +28,6 @@ module.exports = (req, res, next) => {
         throw err
     }
     
-    console.log('the authorised user', verifiedToken)
     req.userId = verifiedToken.userId
     next()
 }
