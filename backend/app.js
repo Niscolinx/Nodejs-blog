@@ -66,7 +66,7 @@ mongoose
         const server = app.listen(3030)
         const socket = require('socket.io')(server)
         socket.on('connection', event => {
-            console.log('Connect to the client', event)
+            console.log('Connected to the client')
         })
     })
     .catch((err) => console.log(err))
