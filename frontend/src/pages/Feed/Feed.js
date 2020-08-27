@@ -46,7 +46,7 @@ class Feed extends Component {
         socket.on('posts', (data) => {
             console.log('Gotten notification', data)
             if (data.action === 'create') {
-                this.addPost(data.posts)
+                this.addPost(data.post)
             }
         })
     }

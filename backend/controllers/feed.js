@@ -5,9 +5,11 @@ const socket = require('../socket')
 const Post = require('../models/post')
 const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
+const post = require('../models/post')
 
 const MAX_PRODUCT_TO_DISPLAY = 1
 
+let createdUser;
 exports.getPosts = (req, res, next) => {
     const page = req.query.page || 1
     let totalItems
@@ -22,6 +24,7 @@ exports.getPosts = (req, res, next) => {
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
+            createdUser = posts
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
@@ -82,7 +85,8 @@ exports.createPost = (req, res, next) => {
 
     socket.getIO().emit('posts', {
         action: 'create',
-        posts,
+        post,
+        creator: { _id: createdUser[0].creator._id, username: createdUser[0].creator.username },
     })
     return post
         .save()
