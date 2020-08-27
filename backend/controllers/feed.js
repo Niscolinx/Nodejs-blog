@@ -93,7 +93,7 @@ exports.createPost = (req, res, next) => {
             socket.getIO().emit('posts', {
                 action: 'create',
                 post: {
-                    ...fetchedPost, creator: {
+                    ...fetchedPost._doc, creator: {
                         _id: user._id, 
                         username: user.username
                     }
@@ -155,6 +155,7 @@ exports.editPost = (req, res, next) => {
             if (oldImage) {
                 fileDelete.deleteFile(oldImage)
             }
+            console.log('the usertoupdate', userToUpdate)
 
             socket.getIO().emit('posts', {
                 action: 'update',
