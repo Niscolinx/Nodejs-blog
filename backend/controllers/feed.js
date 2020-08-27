@@ -127,10 +127,8 @@ exports.editPost = (req, res, next) => {
     }
 
     let oldImage
-    let userToUpdate;
     Post.findById(postId).populate('creator')
         .then((foundPost) => {
-            userToUpdate = foundPost
 
             const { title, content } = req.body
 
@@ -156,16 +154,16 @@ exports.editPost = (req, res, next) => {
             if (oldImage) {
                 fileDelete.deleteFile(oldImage)
             }
-            console.log('the usertoupdate', userToUpdate, 'the result', result)
+            console.log('the result', result)
 
             socket.getIO().emit('posts', {
                 action: 'update',
                 post: {
-                    ...result,
-                    // creator: {
-                    //     _id: req.userId._id,
-                    //     username: userToUpdate.creator.username,
-                    // },
+                    ...result._doc,
+                    creator: {
+                        _id: req.userId._id,
+                        username: result.creator.username,
+                    },
                 },
             })
             res.status(201).json({
