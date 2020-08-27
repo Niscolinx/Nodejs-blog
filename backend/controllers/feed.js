@@ -38,13 +38,21 @@ exports.getPosts = (req, res, next) => {
         })
 }
 
-exports.postUserStatus = async (req, res, next) => {
+exports.putUserStatus = async (req, res, next) => {
 
     const {status} = req.body
     const user = await User.findById(req.userId)
 
-    console.log('the user with status', user, req.body)
-
+    user.status = status
+    try{
+        const updatedUser = await user.save()
+        res.json({message: 'Updated user status', updatedUser})
+    }
+    catch(err){
+        const error = new Error('Failed to updated user status')
+        error.statusCode = 500
+        throw error
+    }
 }
 
 exports.createPost = (req, res, next) => {
