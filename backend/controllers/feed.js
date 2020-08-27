@@ -5,11 +5,9 @@ const socket = require('../socket')
 const Post = require('../models/post')
 const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
-const post = require('../models/post')
 
 const MAX_PRODUCT_TO_DISPLAY = 1
 
-let createdUser;
 exports.getPosts = (req, res, next) => {
     const page = req.query.page || 1
     let totalItems
@@ -24,7 +22,6 @@ exports.getPosts = (req, res, next) => {
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
-            createdUser = posts
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
@@ -82,12 +79,7 @@ exports.createPost = (req, res, next) => {
         imageUrl,
         creator: req.userId,
     })
-    console.log('created user is', createdUser)
-    socket.getIO().emit('posts', {
-        action: 'create',
-        post,
-        creator: { _id: createdUser[0].creator._id, username: createdUser[0].creator.username },
-    })
+    
     return post
         .save()
         .then((post) => {
@@ -97,6 +89,16 @@ exports.createPost = (req, res, next) => {
         .then((user) => {
             user.posts.push(fetchedPost._id.toString())
 
+            console.log('the fetched post', fetchedPost)
+            socket.getIO().emit('posts', {
+                action: 'create',
+                post: {
+                    ...fetchedPost, creator: {
+                        _id: user._id, 
+                        username: user.username
+                    }
+                }
+            })
             return user.save()
         })
         .then((userPost) => {

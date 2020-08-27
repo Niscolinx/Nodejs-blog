@@ -67,6 +67,21 @@ class Feed extends Component {
         })
     }
 
+    updatedPost = (post) => {
+        this.setState((prevState) => {
+            const updatedPosts = [...prevState.posts]
+            const updatedPostIndex = updatedPosts.findIndex(
+                (p) => p._id === post._id
+            )
+            if (updatedPostIndex > -1) {
+                updatedPosts[updatedPostIndex] = post
+            }
+            return {
+                posts: updatedPosts,
+            }
+        })
+    }
+
     loadPosts = (direction) => {
         if (direction) {
             this.setState({ postsLoading: true, posts: [] })
@@ -194,8 +209,6 @@ class Feed extends Component {
                             (p) => p._id === prevState.editPost._id
                         )
                         updatedPosts[postIndex] = post
-                    } else if (prevState.posts.length < 2) {
-                        updatedPosts = prevState.posts.concat(post)
                     }
                     return {
                         posts: updatedPosts,
