@@ -22,11 +22,17 @@ exports.getPosts = (req, res, next) => {
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
+            let status;
+            console.log('the post', posts)
+            
+                status = posts[0].creator.status
+            
+          
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
+                status,
                 totalItems,
-                status: posts[0].creator.status,
                 lastPage: MAX_PRODUCT_TO_DISPLAY,
             })
         })
@@ -83,6 +89,7 @@ exports.createPost = (req, res, next) => {
     return post
         .save()
         .then((post) => {
+            console.log('the post', post, 'the user ', req.userId)
             fetchedPost = post
             return User.findById(req.userId)
         })
