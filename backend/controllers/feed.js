@@ -21,20 +21,14 @@ exports.getPosts = (req, res, next) => {
                 .skip((page - 1) * MAX_PRODUCT_TO_DISPLAY)
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
-        .then((posts) => {
-            let status;
-            console.log('the post', posts)
-            
-                status = posts[0].creator.status
-            
-          
-            res.status(200).json({
-                message: 'Fetched posts successfully.',
-                posts,
-                status,
-                totalItems,
-                lastPage: MAX_PRODUCT_TO_DISPLAY,
-            })
+        .then((posts) => {            
+                 res.status(200).json({
+                    message: 'Fetched posts successfully.',
+                    posts,
+                    status: posts.length > 0 ? posts[0].creator.status : 'No Post',
+                    totalItems,
+                    lastPage: MAX_PRODUCT_TO_DISPLAY,
+                })
         })
         .catch((err) => {
             if (!err.statusCode) {
@@ -46,6 +40,7 @@ exports.getPosts = (req, res, next) => {
 
 exports.putUserStatus = async (req, res, next) => {
 
+    
     const {status} = req.body
     const user = await User.findById(req.userId)
 
@@ -89,14 +84,13 @@ exports.createPost = (req, res, next) => {
     return post
         .save()
         .then((post) => {
-            console.log('the post', post, 'the user ', req.userId)
+            
             fetchedPost = post
             return User.findById(req.userId)
         })
         .then((user) => {
             user.posts.push(fetchedPost._id.toString())
 
-            console.log('the fetched post', fetchedPost)
             socket.getIO().emit('posts', {
                 action: 'create',
                 post: {
@@ -162,16 +156,16 @@ exports.editPost = (req, res, next) => {
             if (oldImage) {
                 fileDelete.deleteFile(oldImage)
             }
-            console.log('the usertoupdate', userToUpdate)
+            console.log('the usertoupdate', userToUpdate, 'the result', result)
 
             socket.getIO().emit('posts', {
                 action: 'update',
                 post: {
                     ...result,
-                    creator: {
-                        _id: updatedUser._id,
-                        username: updatedUser.username,
-                    },
+                    // creator: {
+                    //     _id: req.userId._id,
+                    //     username: userToUpdate.creator.username,
+                    // },
                 },
             })
             res.status(201).json({
