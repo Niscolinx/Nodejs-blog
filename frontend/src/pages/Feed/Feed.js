@@ -23,8 +23,11 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-    
-        fetch('http://localhost:3030/feed/posts')
+        fetch('http://localhost:3030/feed/posts', {
+            headers: {
+                Authorization: 'Bearer ' + this.props.token,
+            },
+        })
             .then((res) => {
                 if (res.status !== 200) {
                     throw new Error('Failed to fetch user status.')
@@ -32,6 +35,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
+                console.log('the res data', resData)
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -39,15 +43,15 @@ class Feed extends Component {
         this.loadPosts()
 
         const socket = openSocket('http://localhost:3030')
-        socket.on('posts', data => {
+        socket.on('posts', (data) => {
             console.log('Gotten notification', data)
-            if(data.action === 'create'){
+            if (data.action === 'create') {
                 this.addPost(data.posts)
             }
         })
     }
 
-    addPost = post => {
+    addPost = (post) => {
         this.setState((prevState) => {
             const updatedPosts = [...prevState.posts]
             if (prevState.postPage === 1) {
@@ -88,7 +92,6 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('From the post', resData)
                 this.setState({
                     posts: resData.posts,
                     totalPosts: resData.totalItems,
@@ -101,7 +104,12 @@ class Feed extends Component {
 
     statusUpdateHandler = (event) => {
         event.preventDefault()
-        fetch('URL')
+        fetch('http://localhost:3030/feed/userStatus', {
+            method: 'PUT',
+            body: {
+                status: this.state.status,
+            },
+        })
             .then((res) => {
                 console.log('from the status', res)
                 if (res.status !== 200 && res.status !== 201) {
@@ -301,7 +309,6 @@ class Feed extends Component {
                             currentPage={this.state.postPage}
                         >
                             {this.state.posts.map((post) => {
-                             
                                 return (
                                     <Post
                                         key={post._id}

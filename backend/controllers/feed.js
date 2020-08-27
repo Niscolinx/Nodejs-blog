@@ -17,15 +17,16 @@ exports.getPosts = (req, res, next) => {
         .then((totalProducts) => {
             totalItems = totalProducts
             return Post.find()
+                .populate('creator')
                 .skip((page - 1) * MAX_PRODUCT_TO_DISPLAY)
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
-            console.log('the get posts', posts)
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
                 totalItems,
+                status: posts[0].creator.status,
                 lastPage: MAX_PRODUCT_TO_DISPLAY,
             })
         })
@@ -35,6 +36,15 @@ exports.getPosts = (req, res, next) => {
             }
             next(err)
         })
+}
+
+exports.putUserStatus = async (req, res, next) => {
+
+    const {status} = req.body
+    const user = await User.findById(req.userId)
+
+    console.log('the user with status', user, status)
+
 }
 
 exports.createPost = (req, res, next) => {

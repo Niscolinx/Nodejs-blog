@@ -26,6 +26,7 @@ class SinglePost extends Component {
                 return res.json()
             })
             .then((resData) => {
+                console.log('the single post data', resData)
                 let image = 'http://localhost:3030/' + resData.post.imageUrl
                 this.setState({
                     title: resData.post.title,

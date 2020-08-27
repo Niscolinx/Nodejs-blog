@@ -9,6 +9,8 @@ const router = express.Router()
 // GET /feed/posts
 router.get('/posts', isAuth, feedController.getPosts)
 
+router.put('/userStatus', isAuth, feedController.putUserStatus)
+
 // POST /feed/post
 router.post(
     '/post',
