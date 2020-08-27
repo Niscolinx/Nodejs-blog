@@ -63,6 +63,10 @@ mongoose
     )
     .then((result) => {
         console.log('Connected!!')
-        app.listen(3030)
+        const server = app.listen(3030)
+        const socket = require('socket.io')(server)
+        socket.on('connection', event => {
+            console.log('Connect to the client', event)
+        })
     })
     .catch((err) => console.log(err))

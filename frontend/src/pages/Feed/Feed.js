@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import openSocket from 'socket.io-client'
 
 import Post from '../../components/Feed/Post/Post'
 import Button from '../../components/Button/Button'
@@ -22,7 +23,7 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-        console.log('the token props', this.props.token)
+    
         fetch('http://localhost:3030/feed/posts')
             .then((res) => {
                 if (res.status !== 200) {
@@ -36,6 +37,8 @@ class Feed extends Component {
             .catch(this.catchError)
 
         this.loadPosts()
+
+        openSocket('http://localhost:3030')
     }
 
     loadPosts = (direction) => {
