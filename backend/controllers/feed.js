@@ -82,7 +82,7 @@ exports.createPost = (req, res, next) => {
         imageUrl,
         creator: req.userId,
     })
-
+    console.log('created user is', createdUser)
     socket.getIO().emit('posts', {
         action: 'create',
         post,
