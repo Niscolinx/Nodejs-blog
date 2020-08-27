@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator/check')
 
+const socket = require('../socket')
+
 const Post = require('../models/post')
 const User = require('../models/user')
 const fileDelete = require('../utility/deleteFile')
@@ -58,6 +60,11 @@ exports.createPost = (req, res, next) => {
         content,
         imageUrl,
         creator: req.userId,
+    })
+
+    socket.getIO().emit('posts', {
+        action: 'create',
+        posts,
     })
     return post
         .save()
@@ -174,13 +181,11 @@ exports.deletePost = (req, res, next) => {
             return Post.findOneAndDelete(postId)
         })
         .then((deletedpost) => {
-
             User.findById(deletedpost.creator).then((user) => {
-
                 user.posts.pull(deletedpost._id)
-               return user.save()
+                return user
+                    .save()
                     .then((result) => {
-                        
                         res.json({ message: 'Deleted' })
                     })
                     .catch((err) => {

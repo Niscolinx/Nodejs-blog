@@ -38,7 +38,29 @@ class Feed extends Component {
 
         this.loadPosts()
 
-        openSocket('http://localhost:3030')
+        const socket = openSocket('http://localhost:3030')
+        socket.on('posts', data => {
+            console.log('Gotten notification', data)
+            if(data.action === 'create'){
+                this.addPost(data.posts)
+            }
+        })
+    }
+
+    addPost = post => {
+        this.setState((prevState) => {
+            const updatedPosts = [...prevState.posts]
+            if (prevState.postPage === 1) {
+                if (prevState.posts.length >= 2) {
+                    updatedPosts.pop()
+                }
+                updatedPosts.unshift(post)
+            }
+            return {
+                posts: updatedPosts,
+                totalPosts: prevState.totalPosts + 1,
+            }
+        })
     }
 
     loadPosts = (direction) => {
@@ -81,6 +103,7 @@ class Feed extends Component {
         event.preventDefault()
         fetch('URL')
             .then((res) => {
+                console.log('from the status', res)
                 if (res.status !== 200 && res.status !== 201) {
                     throw new Error("Can't update status!")
                 }
@@ -278,7 +301,7 @@ class Feed extends Component {
                             currentPage={this.state.postPage}
                         >
                             {this.state.posts.map((post) => {
-                                console.log('the fetched psots', post)
+                             
                                 return (
                                     <Post
                                         key={post._id}
