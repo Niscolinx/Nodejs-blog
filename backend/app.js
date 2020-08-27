@@ -1,4 +1,5 @@
 const path = require('path')
+const io = require('./socket')
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -64,7 +65,7 @@ mongoose
     .then((result) => {
         console.log('Connected!!')
         const server = app.listen(3030)
-        const socket = require('socket.io')(server)
+        const socket = io.init(server)
         socket.on('connection', event => {
             console.log('Connected to the client')
         })
