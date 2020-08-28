@@ -23,16 +23,17 @@ exports.getPosts = (req, res, next) => {
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
+            let status
              User.findById(req.userId).then(user => {
                  console.log('the user', user)
+                 status = user.status
              })
 
-            console.log(user)
-            console.log('the posts', posts[0])
+             console.log('the status', status)
             res.status(200).json({
                 message: 'Fetched posts successfully.',
                 posts,
-                status: posts.length > 0 ? posts[0].creator.status : 'No Post',
+                status,
                 totalItems,
                 lastPage: MAX_PRODUCT_TO_DISPLAY,
             })
