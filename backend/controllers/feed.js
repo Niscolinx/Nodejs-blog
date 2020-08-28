@@ -11,31 +11,29 @@ const MAX_PRODUCT_TO_DISPLAY = 1
 exports.getPosts = (req, res, next) => {
     const page = req.query.page || 1
     let totalItems
+    let updatedStatus
 
     Post.find()
-    .countDocuments()
-    .then((totalProducts) => {
-        totalItems = totalProducts
+        .countDocuments()
+        .then((totalProducts) => {
+            totalItems = totalProducts
             return Post.find()
-            .populate('creator')
-            .sort({ createdAt: -1 })
+                .populate('creator')
+                .sort({ createdAt: -1 })
                 .skip((page - 1) * MAX_PRODUCT_TO_DISPLAY)
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
         .then((posts) => {
-            let status
-             User.findById(req.userId).then(user => {
-                 status = user.status
-                 console.log('the user', status)
-             })
+            User.findById(req.userId).then((user) => {
+                updatedStatus = user.status
 
-             console.log('the status', status)
-            res.status(200).json({
-                message: 'Fetched posts successfully.',
-                posts,
-                status,
-                totalItems,
-                lastPage: MAX_PRODUCT_TO_DISPLAY,
+                res.status(200).json({
+                    message: 'Fetched posts successfully.',
+                    posts,
+                    status: updatedStatus,
+                    totalItems,
+                    lastPage: MAX_PRODUCT_TO_DISPLAY,
+                })
             })
         })
         .catch((err) => {
@@ -159,7 +157,6 @@ exports.editPost = (req, res, next) => {
             if (oldImage) {
                 fileDelete.deleteFile(oldImage)
             }
-            console.log('the result', result)
 
             socket.getIO().emit('posts', {
                 action: 'update',

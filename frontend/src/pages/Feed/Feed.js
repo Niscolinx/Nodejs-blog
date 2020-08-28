@@ -36,7 +36,6 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the user email is', resData)
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -145,7 +144,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the updated post', resData.updatedUser.email)
+               
                 this.setState({
                     status: resData.updatedUser.status,
                     user: resData.updatedUser.email 

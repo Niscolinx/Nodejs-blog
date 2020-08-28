@@ -28,7 +28,6 @@ exports.postSignup = (req, res, next) => {
             return user.save()
         })
         .then((result) => {
-            console.log(result)
             res.status(201).json({ message: 'Successful signup' })
         })
         .catch((err) => {
@@ -60,8 +59,7 @@ exports.postLogin = (req, res, next) => {
                         error.statusCode = 401
                         throw error
                     }
-                    
-                    console.log('the user in login', user._id.toString())
+                   
                     const token = jwt
                         .sign(
                             {  email: user.email, userId: user._id.toString() },
