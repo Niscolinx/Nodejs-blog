@@ -13,22 +13,29 @@ exports.getPosts = (req, res, next) => {
     let totalItems
 
     Post.find()
-        .countDocuments()
-        .then((totalProducts) => {
-            totalItems = totalProducts
+    .countDocuments()
+    .then((totalProducts) => {
+        totalItems = totalProducts
             return Post.find()
-                .populate('creator')
+            .populate('creator')
+            .sort({ createdAt: -1 })
                 .skip((page - 1) * MAX_PRODUCT_TO_DISPLAY)
                 .limit(MAX_PRODUCT_TO_DISPLAY)
         })
-        .then((posts) => {            
-                 res.status(200).json({
-                    message: 'Fetched posts successfully.',
-                    posts,
-                    status: posts.length > 0 ? posts[0].creator.status : 'No Post',
-                    totalItems,
-                    lastPage: MAX_PRODUCT_TO_DISPLAY,
-                })
+        .then((posts) => {
+             User.findById(req.userId).then(user => {
+                 console.log('the user', user)
+             })
+
+            console.log(user)
+            console.log('the posts', posts[0])
+            res.status(200).json({
+                message: 'Fetched posts successfully.',
+                posts,
+                status: posts.length > 0 ? posts[0].creator.status : 'No Post',
+                totalItems,
+                lastPage: MAX_PRODUCT_TO_DISPLAY,
+            })
         })
         .catch((err) => {
             if (!err.statusCode) {
@@ -39,17 +46,14 @@ exports.getPosts = (req, res, next) => {
 }
 
 exports.putUserStatus = async (req, res, next) => {
-
-    
-    const {status} = req.body
+    const { status } = req.body
     const user = await User.findById(req.userId)
 
     user.status = status
-    try{
+    try {
         const updatedUser = await user.save()
-        res.json({message: 'Updated user status', updatedUser})
-    }
-    catch(err){
+        res.json({ message: 'Updated user status', updatedUser })
+    } catch (err) {
         const error = new Error('Failed to updated user status')
         error.statusCode = 500
         throw error
@@ -80,11 +84,10 @@ exports.createPost = (req, res, next) => {
         imageUrl,
         creator: req.userId,
     })
-    
+
     return post
         .save()
         .then((post) => {
-            
             fetchedPost = post
             return User.findById(req.userId)
         })
@@ -94,11 +97,12 @@ exports.createPost = (req, res, next) => {
             socket.getIO().emit('posts', {
                 action: 'create',
                 post: {
-                    ...fetchedPost._doc, creator: {
-                        _id: user._id, 
-                        username: user.username
-                    }
-                }
+                    ...fetchedPost._doc,
+                    creator: {
+                        _id: user._id,
+                        username: user.username,
+                    },
+                },
             })
             return user.save()
         })
@@ -127,9 +131,9 @@ exports.editPost = (req, res, next) => {
     }
 
     let oldImage
-    Post.findById(postId).populate('creator')
+    Post.findById(postId)
+        .populate('creator')
         .then((foundPost) => {
-
             const { title, content } = req.body
 
             if (foundPost.creator._id.toString() !== req.userId) {
@@ -221,9 +225,14 @@ exports.deletePost = (req, res, next) => {
         .then((deletedpost) => {
             User.findById(deletedpost.creator).then((user) => {
                 user.posts.pull(deletedpost._id)
+
                 return user
                     .save()
                     .then((result) => {
+                        socket.getIO().emit('posts', {
+                            action: 'delete',
+                            post: deletedpost._id,
+                        })
                         res.json({ message: 'Deleted' })
                     })
                     .catch((err) => {

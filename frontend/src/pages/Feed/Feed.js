@@ -17,6 +17,7 @@ class Feed extends Component {
         totalPosts: 0,
         editPost: null,
         status: '',
+        user: '',
         postPage: 1,
         postsLoading: true,
         editLoading: false,
@@ -35,7 +36,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the res data', resData)
+                console.log('the user email is', resData)
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -51,6 +52,10 @@ class Feed extends Component {
             if(data.action === 'update'){
               
                 this.updatedPost(data.post)
+            }
+
+            if(data.action === 'delete'){
+                this.loadPosts()
             }
         })
     }
@@ -140,8 +145,10 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
+                console.log('the updated post', resData.updatedUser.email)
                 this.setState({
-                    status: resData.updatedUser.status
+                    status: resData.updatedUser.status,
+                    user: resData.updatedUser.email 
                 })
             })
             .catch(this.catchError)
@@ -200,15 +207,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                const post = {
-                    _id: resData.posts._id,
-                    title: resData.posts.title,
-                    content: resData.posts.content,
-                    creator: resData.posts.creator,
-                    createdAt: resData.posts.createdAt,
-                }
                 this.setState((prevState) => {
-                    let updatedPosts = [...prevState.posts]
                     
                     return {
                         isEditing: false,
@@ -247,12 +246,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                this.setState((prevState) => {
-                    const updatedPosts = prevState.posts.filter(
-                        (p) => p._id !== postId
-                    )
-                    return { posts: updatedPosts, postsLoading: false }
-                })
+                this.loadPosts()
             })
             .catch((err) => {
                 console.log(err)
