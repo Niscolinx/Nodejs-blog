@@ -1,13 +1,14 @@
 const path = require('path')
-const io = require('./socket')
 
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const multer = require('multer')
 
-const feedRoutes = require('./routes/feed')
-const authRoutes = require('./routes/auth')
+const graphqlHttp = require('express-graphql')
+const schema = require('./graphql/schema')
+const resolver = require('./graphql/resolvers')
+
 
 const app = express()
 
@@ -46,8 +47,11 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use('/feed', feedRoutes)
-app.use('/auth', authRoutes)
+
+app.use('/graphql', () => {
+    schema: schema
+    root: resolver
+})
 
 app.use((error, req, res, next) => {
     console.log(error, error.errorMessage)
@@ -64,10 +68,7 @@ mongoose
     )
     .then((result) => {
         console.log('Connected!!')
-        const server = app.listen(3030)
-        const socket = io.init(server)
-        socket.on('connection', event => {
-            console.log('Connected to the client')
-        })
+        app.listen(3030)
+        
     })
     .catch((err) => console.log(err))
