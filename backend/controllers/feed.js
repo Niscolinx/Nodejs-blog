@@ -25,8 +25,8 @@ exports.getPosts = (req, res, next) => {
         .then((posts) => {
             let status
              User.findById(req.userId).then(user => {
-                 console.log('the user', user)
                  status = user.status
+                 console.log('the user', status)
              })
 
              console.log('the status', status)
