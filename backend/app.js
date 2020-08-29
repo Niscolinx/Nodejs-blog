@@ -52,7 +52,7 @@ app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
     graphiql: true,
-    formatError(err){
+    customFormatErrorFn(err){
         if(!err.originalError){
             return err
         }
@@ -71,7 +71,6 @@ app.use((error, req, res, next) => {
     console.log(error, error.errorMessage)
     const status = error.statusCode || 500
     const message = error.message
-    const errorMessage = error.errorMessage
     res.status(status).json({ message: message })
 })
 
