@@ -6,15 +6,24 @@ const User = require('../models/user')
 module.exports = {
     createUser: async function ({ userData }, req) {
         const error = []
-        if (!validator.isEmail(userData.email)) {
+        if (
+            !validator.isEmail(userData.email) ||
+            validator.isEmpty(userData.email)
+        ) {
             error.push({ message: 'Invalid Email Field' })
         }
-        if (!validator.isLength(userData.username, { min: 5 })) {
+        if (
+            !validator.isLength(userData.username, { min: 5 }) ||
+            validator.isEmpty(userData.username)
+        ) {
             error.push({
                 message: 'Username must be at least 5 characters long',
             })
         }
-        if (!validator.isLength(userData.password, { min: 5 })) {
+        if (
+            !validator.isLength(userData.password, { min: 5 }) ||
+            validator.isEmpty(userData.password)
+        ) {
             error.push({
                 message: 'Password must be at least 5 characters long',
             })
@@ -25,32 +34,32 @@ module.exports = {
             throw err
         }
 
-        const user = await User.findOne({ email: userData.email })
+        const existingUser = await User.findOne({ email: userData.email })
 
-        if (user) {
+        if (existingUser) {
             const error = new Error('User already exists')
             throw error
         }
-        try{
-            const hashedPassword = await bcrypt(userData.password, 12)
+        try {
+            const hashedPassword = await bcrypt.hash(userData.password, 12)
 
-            if(hashedPassword){
-                
+            if (hashedPassword) {
                 const newUser = new User({
-                    username = userData.username,
-                    email = userData.email,
-                    password = hashedPassword
+                    username: userData.username,
+                    email: userData.email,
+                    password: hashedPassword,
                 })
 
-                const userSignupUp = await newUser.save()
+                const createdUser = await newUser.save()
 
-                if(userSignupUp){
-                    return 'Successful sign up'
+                if (createdUser) {
+                    return {
+                        ...createdUser._doc,
+                        _id: createdUser._id.toString(),
+                    }
                 }
-
             }
-        }
-        catch(err){
+        } catch (err) {
             throw new Error(err)
         }
     },
