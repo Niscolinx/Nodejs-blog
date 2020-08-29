@@ -85,9 +85,14 @@ module.exports = {
             throw error
         }
 
+        const token = jwt.sign(
+            { email: userExits.email, userId: userExits._id.toString() },
+            'supersecretkey',
+            { expiresIn: '1hr' }
+        )
         return {
             userId: userExits._id.toString(),
-            token: checkPassword.token
+            token
         }
     }
 }

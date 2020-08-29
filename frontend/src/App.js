@@ -63,7 +63,7 @@ class App extends Component {
     loginHandler = (event, authData) => {
         event.preventDefault()
         this.setState({ authLoading: true })
-        fetch('http://localhost:3030/auth/login', {
+        fetch('http://localhost:3030/graphql', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
