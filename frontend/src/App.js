@@ -112,31 +112,33 @@ class App extends Component {
         event.preventDefault()
         this.setState({ authLoading: true })
 
-        const graphqlQuery = ` mutation { createUser(userData: {
+        const graphqlQuery = {
+            query: ` mutation { createUser(userData: {
             username: "${authData.signupForm.username.value}",
             email: "${authData.signupForm.email.value}",
             password: "${authData.signupForm.password.value}"
-          }) {  status, _id, posts { title } }
-        }`
-        
+           }) {  email }
+         }`,
+        }
+
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
-                if (res.status === 422) {
-                    throw new Error(
-                        'Validation failed. Please make sure your input values are correct'
-                    )
-                }
-                if (res.status !== 200 && res.status !== 201) {
-                    throw new Error('Creating a user failed!')
-                }
                 return res.json()
             })
             .then((resData) => {
                 console.log('new user', resData)
+                if (resData.errors && resData.errors[0].statusCode === 422) {
+                    throw new Error(
+                        'Validation failed. Please make sure your input values are correct'
+                    )
+                }
+                if (resData.errors) {
+                    throw new Error('Creating a user failed!')
+                }
                 this.setState({ isAuth: false, authLoading: false })
                 this.props.history.replace('/')
             })

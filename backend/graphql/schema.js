@@ -21,6 +21,11 @@ module.exports = buildSchema(`
         posts: [Post!]!
     }
 
+    type AuthData {
+        token: String!
+        userId: String!
+    }
+
     input UserInputData {
         username: String!
         email: String!
@@ -32,7 +37,7 @@ module.exports = buildSchema(`
     }
 
     type createUser{
-        username: String
+        login(name: String, password: String): AuthData!
     }
 
     schema {
