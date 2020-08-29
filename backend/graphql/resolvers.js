@@ -31,6 +31,8 @@ module.exports = {
 
         if (error.length > 0) {
             const err = new Error('Invalid User Input')
+            err.statusCode = 422
+            err.data = error
             throw err
         }
 
