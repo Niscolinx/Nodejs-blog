@@ -69,6 +69,33 @@ module.exports = {
     },
 
     createPost: async function ({ postData }, req) {
+
+         const error = []
+    
+         if (
+             !validator.isLength(postData.title, { min: 5 }) ||
+             validator.isEmpty(postData.title)
+         ) {
+             error.push({
+                 message: 'title must be at least 5 characters long',
+             })
+         }
+         if (
+             !validator.isLength(postData.content, { min: 5 }) ||
+             validator.isEmpty(postData.content)
+         ) {
+             error.push({
+                 message: 'Content must be at least 5 characters long',
+             })
+         }
+
+         if (error.length > 0) {
+             const err = new Error('Invalid post data')
+             err.statusCode = 422
+             err.data = error
+             throw err
+         }
+
         const post = new Post({
             title: postData.title,
             content: postData.content,
