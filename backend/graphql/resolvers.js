@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const User = require('../models/user')
+const Post = require('../models/post')
 
 module.exports = {
     createUser: async function ({ userData }, req) {
@@ -67,12 +68,50 @@ module.exports = {
         }
     },
 
-    login: async function({email, password}){
+    createPost: async function ({ postData }, req) {
+        const post = new Post({
+            title: postData.title,
+            content: postData.content,
+            imageUrl: postData.imageUrl,
+        })
 
+        const savePost = await post.save()
+
+        return {
+            ...savePost._doc,
+            _id: savePost._id,
+            createdAt: savePost.createdAt.toISOString(),
+            updatedAt: savePost.updatedAt.toISOString(),
+        }
+    },
+
+    login: async function ({ email, password }) {
         console.log('Reached the login')
-        const userExits = await User.findOne({email})
 
-        if(!userExits){
+        const error = []
+        if (!validator.isEmail(email) || validator.isEmpty(email)) {
+            error.push({ message: 'Invalid Email Field' })
+        }
+
+        if (
+            !validator.isLength(password, { min: 5 }) ||
+            validator.isEmpty(password)
+        ) {
+            error.push({
+                message: 'Password must be at least 5 characters long',
+            })
+        }
+
+        if (error.length > 0) {
+            const err = new Error('Invalid User Input')
+            err.statusCode = 422
+            err.data = error
+            throw err
+        }
+
+        const userExits = await User.findOne({ email })
+
+        if (!userExits) {
             const error = new Error('User does not exist')
             error.statusCode = 401
             throw error
@@ -80,7 +119,7 @@ module.exports = {
 
         const checkPassword = bcrypt.compare(password, userExits.password)
 
-        if(!checkPassword){
+        if (!checkPassword) {
             const error = new Error('Incorrect Password')
             error.statusCode = 401
             throw error
@@ -93,7 +132,7 @@ module.exports = {
         )
         return {
             userId: userExits._id.toString(),
-            token
+            token,
         }
-    }
+    },
 }
