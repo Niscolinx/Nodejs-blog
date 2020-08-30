@@ -69,6 +69,7 @@ module.exports = {
 
     login: async function({email, password}){
 
+        console.log('Reached the login')
         const userExits = await User.findOne({email})
 
         if(!userExits){
