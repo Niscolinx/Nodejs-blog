@@ -113,7 +113,6 @@ module.exports = {
     },
 
     login: async function ({ email, password }) {
-        console.log('Reached the login')
 
         const error = []
         if (!validator.isEmail(email) || validator.isEmpty(email)) {

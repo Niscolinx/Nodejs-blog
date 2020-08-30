@@ -5,9 +5,8 @@ module.exports = (req, res, next) => {
     const authToken = req.get('Authorization')
 
     if(!authToken){
-        const error = new Error('Unauthorized')
-        error.statusCode = 403
-        throw error
+       req.Auth = false
+       next()
     }
    
     const gottenToken = authToken.split(' ')[1]
@@ -18,16 +17,16 @@ module.exports = (req, res, next) => {
        verifiedToken =  jwt.verify(gottenToken, 'supersecretkey')
     }
     catch(err){
-        err.statusCode = 500
-        throw err
+        req.Auth = false
+        next()
     }
 
     if(!verifiedToken){
-        const error = new Error('Not authenticated')
-        error.statusCode = 403
-        throw err
+         req.Auth = false
+         next()
     }
     
     req.userId = verifiedToken.userId
+    req.Auth = true
     next()
 }
