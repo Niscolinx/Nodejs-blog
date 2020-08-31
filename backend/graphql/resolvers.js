@@ -158,7 +158,7 @@ module.exports = {
             throw error
         }
 
-        const checkPassword = bcrypt.compare(password, userExits.password)
+        const checkPassword = await bcrypt.compare(password, userExits.password)
 
         if (!checkPassword) {
             const error = new Error('Incorrect Password')
@@ -171,6 +171,7 @@ module.exports = {
             'supersecretkey',
             { expiresIn: '1hr' }
         )
+
         return {
             userId: userExits._id.toString(),
             token,

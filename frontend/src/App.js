@@ -73,11 +73,11 @@ class App extends Component {
          `,
         }
 
+        console.log('the props token', this.props.token)
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + this.props.token,
             },
             body: JSON.stringify(graphqlQuery),
         })

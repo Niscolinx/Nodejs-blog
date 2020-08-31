@@ -40,10 +40,7 @@ class Feed extends Component {
             .catch(this.catchError)
 
         this.loadPosts()
-
     }
-
-
 
     loadPosts = (direction) => {
         if (direction) {
@@ -99,10 +96,9 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-               
                 this.setState({
                     status: resData.updatedUser.status,
-                    user: resData.updatedUser.email 
+                    user: resData.updatedUser.email,
                 })
             })
             .catch(this.catchError)
@@ -136,25 +132,33 @@ class Feed extends Component {
         formData.append('content', postData.content)
         formData.append('image', postData.image)
 
+        const graphqlQuery = {
+            query: `
+            mutation {
+                createPost(postData: {
+                    title: "Hello",
+                    content: "ksjfda",
+                    imageUrl: "jsfksa"
+                }){
+                    title
+                }
+            }`,
+        }
+
         this.setState({
             editLoading: true,
         })
         // Set up data (with image!)
-        let url = 'http://localhost:3030/feed/post'
-        let method = 'POST'
-        if (this.state.editPost) {
-            url = 'http://localhost:3030/feed/post/' + this.state.postId
-            method = 'PUT'
-        }
 
-        fetch(url, {
-            method,
+        fetch('http://localhost:3030/graphql', {
+            method: 'POST',
             body: formData,
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
+                console.log('the res', res)
                 if (res.status !== 200 && res.status !== 201) {
                     throw new Error('Creating or editing a post failed!')
                 }
@@ -162,7 +166,6 @@ class Feed extends Component {
             })
             .then((resData) => {
                 this.setState((prevState) => {
-                    
                     return {
                         isEditing: false,
                         editPost: null,
