@@ -136,9 +136,9 @@ class Feed extends Component {
             query: `
             mutation {
                 createPost(postData: {
-                    title: "Hello",
-                    content: "ksjfda",
-                    imageUrl: "jsfksa"
+                    title: "${postData.title}",
+                    content: "${postData.content}",
+                    imageUrl: "Image url"
                 }){
                     title
                 }
@@ -152,19 +152,19 @@ class Feed extends Component {
 
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
-            body: formData,
+            body: graphqlQuery,
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
-                console.log('the res', res)
-                if (res.status !== 200 && res.status !== 201) {
-                    throw new Error('Creating or editing a post failed!')
-                }
+            
                 return res.json()
             })
             .then((resData) => {
+                  if (resData.status !== 200 && resData.status !== 201) {
+                      throw new Error('Creating or editing a post failed!')
+                  }
                 this.setState((prevState) => {
                     return {
                         isEditing: false,
