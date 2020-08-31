@@ -69,40 +69,56 @@ module.exports = {
     },
 
     createPost: async function ({ postData }, req) {
+        const error = []
 
-         const error = []
-    
-         if (
-             !validator.isLength(postData.title, { min: 5 }) ||
-             validator.isEmpty(postData.title)
-         ) {
-             error.push({
-                 message: 'title must be at least 5 characters long',
-             })
-         }
-         if (
-             !validator.isLength(postData.content, { min: 5 }) ||
-             validator.isEmpty(postData.content)
-         ) {
-             error.push({
-                 message: 'Content must be at least 5 characters long',
-             })
-         }
+        if (
+            !validator.isLength(postData.title, { min: 5 }) ||
+            validator.isEmpty(postData.title)
+        ) {
+            error.push({
+                message: 'title must be at least 5 characters long',
+            })
+        }
+        if (
+            !validator.isLength(postData.content, { min: 5 }) ||
+            validator.isEmpty(postData.content)
+        ) {
+            error.push({
+                message: 'Content must be at least 5 characters long',
+            })
+        }
 
-         if (error.length > 0) {
-             const err = new Error('Invalid post data')
-             err.statusCode = 422
-             err.data = error
-             throw err
-         }
+        if (error.length > 0) {
+            const err = new Error('Invalid post data')
+            err.statusCode = 422
+            err.data = error
+            throw err
+        }
+
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
+
+        const user = User.findById(req.userId)
+
+        if (!user) {
+            const err = new Error('Invalid User')
+            err.statusCode = 422
+            throw err
+        }
 
         const post = new Post({
             title: postData.title,
             content: postData.content,
             imageUrl: postData.imageUrl,
+            creator: user
         })
 
         const savePost = await post.save()
+
+        user.posts.push(savePost)
 
         return {
             ...savePost._doc,
@@ -113,7 +129,6 @@ module.exports = {
     },
 
     login: async function ({ email, password }) {
-
         const error = []
         if (!validator.isEmail(email) || validator.isEmpty(email)) {
             error.push({ message: 'Invalid Email Field' })
