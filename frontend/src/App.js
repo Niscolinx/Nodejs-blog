@@ -75,7 +75,10 @@ class App extends Component {
 
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.props.token,
+            },
             body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {

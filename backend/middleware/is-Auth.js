@@ -4,6 +4,8 @@ module.exports = (req, res, next) => {
 
     const authToken = req.get('Authorization')
 
+    console.log('the auth token', authToken)
+
     if(!authToken){
        req.Auth = false
        next()
@@ -25,6 +27,7 @@ module.exports = (req, res, next) => {
          req.Auth = false
          next()
     }
+    console.log('the verified token is ', verifiedToken)
     
     req.userId = verifiedToken.userId
     req.Auth = true
