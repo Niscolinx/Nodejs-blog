@@ -109,6 +109,7 @@ module.exports = {
             throw err
         }
 
+        console.log('the user', user)
         const post = new Post({
             title: postData.title,
             content: postData.content,
@@ -116,9 +117,17 @@ module.exports = {
             creator: user
         })
 
+        console.log('the post ', post)
+
         const savePost = await post.save()
 
+        console.log('the saved Post', savePost)
+
         user.posts.push(savePost)
+
+        const savedUser = await user.save()
+
+        console.log('the saved User', savedUser)
 
         return {
             ...savePost._doc,

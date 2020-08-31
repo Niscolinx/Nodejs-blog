@@ -73,7 +73,6 @@ class App extends Component {
          `,
         }
 
-        console.log('the props token', this.props.token)
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
             headers: {

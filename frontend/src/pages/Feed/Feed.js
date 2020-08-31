@@ -8,6 +8,7 @@ import Paginator from '../../components/Paginator/Paginator'
 import Loader from '../../components/Loader/Loader'
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler'
 import './Feed.css'
+import { createPortal } from 'react-dom'
 
 class Feed extends Component {
     state = {
@@ -134,13 +135,18 @@ class Feed extends Component {
 
         const graphqlQuery = {
             query: `
-            mutation {
-                createPost(postData: {
+            mutation { createPost(postData: {
                     title: "${postData.title}",
                     content: "${postData.content}",
                     imageUrl: "Image url"
                 }){
+                    _id
                     title
+                    content
+                    creator {
+                        name
+                    }
+                    createdAt
                 }
             }`,
         }
@@ -152,8 +158,9 @@ class Feed extends Component {
 
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
-            body: graphqlQuery,
+            body: JSON.stringify(graphqlQuery),
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
             },
         })
@@ -162,9 +169,19 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                  if (resData.status !== 200 && resData.status !== 201) {
-                      throw new Error('Creating or editing a post failed!')
-                  }
+                if (resData.status !== 200 && resData.status !== 201) {
+                    throw new Error('Creating or editing a post failed!')
+                }
+                console.log('the res data' , resData)
+
+                const createdPost = resData.data.createPost
+                const post = {
+                    _id: createdPost._id,
+                    title: createdPost.title,
+                    content: createdPost.content,
+                    creator: createdPost.creator.name,
+                    createdAt: createdPost.createdAt
+                }
                 this.setState((prevState) => {
                     return {
                         isEditing: false,
