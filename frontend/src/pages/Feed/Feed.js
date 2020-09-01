@@ -8,7 +8,6 @@ import Paginator from '../../components/Paginator/Paginator'
 import Loader from '../../components/Loader/Loader'
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler'
 import './Feed.css'
-import { createPortal } from 'react-dom'
 
 class Feed extends Component {
     state = {
@@ -144,7 +143,7 @@ class Feed extends Component {
                     title
                     content
                     creator {
-                        name
+                        username
                     }
                     createdAt
                 }
@@ -165,16 +164,18 @@ class Feed extends Component {
             },
         })
             .then((res) => {
-            
+                console.log('the res', res)
                 return res.json()
             })
             .then((resData) => {
+                console.log('the res data' , resData)
+                const createdPost = resData.data.createPost
+
+                console.log('the created post', createPost)
                 if (resData.status !== 200 && resData.status !== 201) {
                     throw new Error('Creating or editing a post failed!')
                 }
-                console.log('the res data' , resData)
 
-                const createdPost = resData.data.createPost
                 const post = {
                     _id: createdPost._id,
                     title: createdPost.title,

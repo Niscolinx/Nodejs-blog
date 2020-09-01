@@ -69,6 +69,7 @@ module.exports = {
     },
 
     createPost: async function ({ postData }, req) {
+
         const error = []
 
         if (
@@ -101,7 +102,7 @@ module.exports = {
             throw err
         }
 
-        const user = User.findById(req.userId)
+        const user = await User.findById(req.userId)
 
         if (!user) {
             const err = new Error('Invalid User')
@@ -109,7 +110,6 @@ module.exports = {
             throw err
         }
 
-        console.log('the user', user)
         const post = new Post({
             title: postData.title,
             content: postData.content,
@@ -117,21 +117,18 @@ module.exports = {
             creator: user
         })
 
-        console.log('the post ', post)
 
         const savePost = await post.save()
 
-        console.log('the saved Post', savePost)
 
         user.posts.push(savePost)
 
         const savedUser = await user.save()
 
-        console.log('the saved User', savedUser)
 
         return {
             ...savePost._doc,
-            _id: savePost._id,
+            _id: savePost._id.toString(),
             createdAt: savePost.createdAt.toISOString(),
             updatedAt: savePost.updatedAt.toISOString(),
         }
