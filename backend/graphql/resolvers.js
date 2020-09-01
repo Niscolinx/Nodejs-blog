@@ -69,7 +69,6 @@ module.exports = {
     },
 
     createPost: async function ({ postData }, req) {
-
         const error = []
 
         if (
@@ -114,17 +113,14 @@ module.exports = {
             title: postData.title,
             content: postData.content,
             imageUrl: postData.imageUrl,
-            creator: user
+            creator: user,
         })
 
-
         const savePost = await post.save()
-
 
         user.posts.push(savePost)
 
         const savedUser = await user.save()
-
 
         return {
             ...savePost._doc,
@@ -181,6 +177,35 @@ module.exports = {
         return {
             userId: userExits._id.toString(),
             token,
+        }
+    },
+
+    getPosts: async function (arg, req) {
+        console.log('Reached the get posts')
+
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
+
+        const totalPosts = await Post.find().countDocuments()
+        const posts = await Post.find()
+            .sort({ createdAt: -1 })
+            .populate('creator')
+
+        console.log('the posts', posts)
+
+        return {
+            posts: posts.map((p) => {
+                return {
+                    ...p._doc,
+                    _id: p._id.toString(),
+                    createdAt: p.createdAt.toISOString(),
+                    updatedAt: p.updatedAt.toISOString(),
+                }
+            }),
+            totalPosts,
         }
     },
 }

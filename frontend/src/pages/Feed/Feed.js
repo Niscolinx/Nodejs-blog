@@ -23,18 +23,34 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-        fetch('http://localhost:3030/feed/posts', {
+       
+        const graphqlQuery = {
+            query: `{
+                getPosts {
+                      Post {
+                        _id
+                        }
+                    totalPosts
+                  }
+                }`,
+             }
+        fetch('http://localhost:3030/graphql', {
+            method: 'POST',
+            body: JSON.stringify(graphqlQuery),
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
-                if (res.status !== 200) {
-                    throw new Error('Failed to fetch user status.')
-                }
+               
                 return res.json()
             })
             .then((resData) => {
+                console.log('the res data', resData)
+                 if (resData.status !== 200) {
+                     throw new Error('Failed to fetch user status.')
+                 }
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -171,7 +187,7 @@ class Feed extends Component {
                 console.log('the res data' , resData)
                 const createdPost = resData.data.createPost
 
-                console.log('the created post', createPost)
+                console.log('the created post', createdPost)
                 if (resData.status !== 200 && resData.status !== 201) {
                     throw new Error('Creating or editing a post failed!')
                 }
