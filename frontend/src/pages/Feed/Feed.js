@@ -23,7 +23,6 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-       
         const graphqlQuery = {
             query: `{
                 getPosts {
@@ -33,7 +32,7 @@ class Feed extends Component {
                     totalPosts
                   }
                 }`,
-             }
+        }
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
             body: JSON.stringify(graphqlQuery),
@@ -43,14 +42,13 @@ class Feed extends Component {
             },
         })
             .then((res) => {
-               
                 return res.json()
             })
             .then((resData) => {
                 console.log('the res data', resData)
-                 if (resData.status !== 200) {
-                     throw new Error('Failed to fetch user status.')
-                 }
+                if (resData.status !== 200) {
+                    throw new Error('Failed to fetch user status.')
+                }
                 this.setState({ status: resData.status })
             })
             .catch(this.catchError)
@@ -71,18 +69,31 @@ class Feed extends Component {
             page--
             this.setState({ postPage: page })
         }
-        fetch('http://localhost:3030/feed/posts?page=' + page, {
+        const graphqlQuery = {
+            query: `{
+                getPosts {
+                      Post {
+                        _id
+                        }
+                    totalPosts
+                  }
+                }`,
+        }
+        fetch('http://localhost:3030/graphql', {
+            method: 'POST',
+            body: JSON.stringify(graphqlQuery),
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
             },
         })
             .then((res) => {
-                if (res.status !== 200) {
-                    throw new Error('Failed to fetch posts.')
-                }
                 return res.json()
             })
             .then((resData) => {
+                if (resData.status !== 200) {
+                    throw new Error('Failed to fetch posts.')
+                }
                 this.setState({
                     posts: resData.posts,
                     totalPosts: resData.totalItems,
@@ -184,7 +195,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the res data' , resData)
+                console.log('the res data', resData)
                 const createdPost = resData.data.createPost
 
                 console.log('the created post', createdPost)
@@ -197,7 +208,7 @@ class Feed extends Component {
                     title: createdPost.title,
                     content: createdPost.content,
                     creator: createdPost.creator.name,
-                    createdAt: createdPost.createdAt
+                    createdAt: createdPost.createdAt,
                 }
                 this.setState((prevState) => {
                     return {
