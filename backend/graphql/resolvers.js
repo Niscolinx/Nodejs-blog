@@ -197,7 +197,7 @@ module.exports = {
         console.log('the posts', posts)
 
         return {
-            posts: posts.map((p) => {
+            Post: posts.map((p) => {
                 return {
                     ...p._doc,
                     _id: p._id.toString(),

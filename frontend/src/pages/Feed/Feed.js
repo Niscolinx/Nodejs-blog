@@ -23,19 +23,9 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-        const graphqlQuery = {
-            query: `{
-                getPosts {
-                      Post {
-                        _id
-                        }
-                    totalPosts
-                  }
-                }`,
-        }
-        fetch('http://localhost:3030/graphql', {
+      
+        fetch('', {
             method: 'POST',
-            body: JSON.stringify(graphqlQuery),
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
@@ -45,7 +35,6 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the componentDidMount', resData)
                 if (resData.status !== 200) {
                     throw new Error('Failed to fetch user status.')
                 }
@@ -76,7 +65,7 @@ class Feed extends Component {
                         _id
                         title
                         content
-                        ImageUrl
+                        imageUrl
                         createdAt
                         creator {
                             username
@@ -95,20 +84,27 @@ class Feed extends Component {
             },
         })
             .then((res) => {
-                console.log('res data of load posts', res)
                 return res.json()
             })
             .then((resData) => {
-                console.log('the res data of post data', resData)
-                const fetchedPosts = resData.createPost.data
+                const fetchedPosts = resData.data.getPosts
+                console.log('the res data of fetched posts', fetchedPosts)
                 if (resData.status !== 200) {
                     throw new Error('Failed to fetch posts.')
                 }
                 this.setState({
-                    posts: fetchedPosts.posts,
+                    posts: fetchedPosts.Post.map(p => {
+                        console.log('the post items', p)
+                        return {
+                            ...p,
+                            imagePath: p.imageUrl
+                        }
+                    }),
                     totalPosts: fetchedPosts.totalPosts,
                     postsLoading: false,
                 })
+
+                console.log('the state is ', this.state)
             })
             .catch(this.catchError)
     }
