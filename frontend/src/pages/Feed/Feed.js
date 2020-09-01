@@ -45,7 +45,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the res data', resData)
+                console.log('the componentDidMount', resData)
                 if (resData.status !== 200) {
                     throw new Error('Failed to fetch user status.')
                 }
@@ -74,6 +74,13 @@ class Feed extends Component {
                 getPosts {
                       Post {
                         _id
+                        title
+                        content
+                        ImageUrl
+                        createdAt
+                        creator {
+                            username
+                            }   
                         }
                     totalPosts
                   }
@@ -88,16 +95,18 @@ class Feed extends Component {
             },
         })
             .then((res) => {
+                console.log('res data of load posts', res)
                 return res.json()
             })
             .then((resData) => {
+                console.log('the res data of post data', resData)
+                const fetchedPosts = resData.createPost.data
                 if (resData.status !== 200) {
                     throw new Error('Failed to fetch posts.')
                 }
                 this.setState({
-                    posts: resData.posts,
-                    totalPosts: resData.totalItems,
-                    lastPage: resData.lastPage,
+                    posts: fetchedPosts.posts,
+                    totalPosts: fetchedPosts.totalPosts,
                     postsLoading: false,
                 })
             })
