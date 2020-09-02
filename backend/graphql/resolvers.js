@@ -180,8 +180,8 @@ module.exports = {
         }
     },
 
-    getPosts: async function (arg, req) {
-        console.log('Reached the get posts')
+    getPosts: async function ({ page }, req) {
+        console.log('Reached the get posts', page)
 
         if (!req.Auth) {
             const err = new Error('Not authenticated')
@@ -189,9 +189,16 @@ module.exports = {
             throw err
         }
 
+        if (!page) {
+            page = 1
+        }
+
+        const perPage = 2
         const totalPosts = await Post.find().countDocuments()
         const posts = await Post.find()
             .sort({ createdAt: -1 })
+            .skip((page - 1) * perPage)
+            .limit(perPage)
             .populate('creator')
 
         console.log('the posts', posts)
@@ -199,6 +206,7 @@ module.exports = {
         return {
             Post: posts.map((p) => {
                 return {
+                    ...p._doc,
                     ...p._doc,
                     _id: p._id.toString(),
                     createdAt: p.createdAt.toISOString(),
