@@ -164,12 +164,17 @@ class Feed extends Component {
         const formData = new FormData()
         formData.append('image', postData.image)
 
+        if(this.state.editPost){
+            formData.append('oldImage', postData.image)
+        }
+
+        console.log('the imaage', formData)
         fetch('http://localhost:3030/post-image', {
             method : 'PUT',
             headers: {
                 Authorization: 'Bearer ' + this.props.token
             },
-            body: JSON.stringify(formData)
+            body: formData
         }).then(res => {
             return res.json()
         }).then(result => {

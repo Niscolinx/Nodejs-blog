@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 app.use(auth)
 
 app.put('/post-image', (req, res, next) => {
-    console.log('Reached the image', req.body)
+    console.log('Reached the image', req.body, req.file)
     if (!req.Auth) {
         throw new Error('Not authenticated!')
     }
