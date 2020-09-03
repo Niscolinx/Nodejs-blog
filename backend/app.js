@@ -6,11 +6,11 @@ const mongoose = require('mongoose')
 const multer = require('multer')
 
 const auth = require('./middleware/is-Auth')
+const deleteFile = require('./utility/deleteFile')
 
-const {graphqlHTTP} = require('express-graphql')
+const { graphqlHTTP } = require('express-graphql')
 const graphqlSchema = require('./graphql/schema')
 const graphqlResolver = require('./graphql/resolvers')
-
 
 const app = express()
 
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
     )
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
-    if(req.method === 'OPTIONS'){
+    if (req.method === 'OPTIONS') {
         return res.sendStatus(200)
     }
     next()
@@ -55,24 +55,47 @@ app.use((req, res, next) => {
 
 app.use(auth)
 
-app.use('/graphql', graphqlHTTP({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
-    graphiql: true,
-    customFormatErrorFn(err){
-        if(!err.originalError){
-            return err
-        }
-
-        const message = err.message || 'An error occurred'
-        const statusCode = err.originalError.statusCode || 500
-        const data = err.originalError.data
-        
-        return {
-            message, statusCode, data
-        }
+app.put('/post-image', (req, res, next) => {
+    if (!req.Auth) {
+        throw new Error('Not authenticated!')
     }
-}))
+
+    if (!req.image) {
+        res.status(200).json({ message: 'No file uploaded' })
+    }
+
+    if (req.body.image) {
+        console.log('the old image', oldImage)
+        deleteFile.deleteFile(req.body.oldImage)
+        res.status(201).json({ message: 'Image uploaded successfully', filePath: req.body.oldImage})
+    }
+
+
+})
+
+app.use(
+    '/graphql',
+    graphqlHTTP({
+        schema: graphqlSchema,
+        rootValue: graphqlResolver,
+        graphiql: true,
+        customFormatErrorFn(err) {
+            if (!err.originalError) {
+                return err
+            }
+
+            const message = err.message || 'An error occurred'
+            const statusCode = err.originalError.statusCode || 500
+            const data = err.originalError.data
+
+            return {
+                message,
+                statusCode,
+                data,
+            }
+        },
+    })
+)
 
 app.use((error, req, res, next) => {
     console.log(error, error.errorMessage)
@@ -89,6 +112,5 @@ mongoose
     .then((result) => {
         console.log('Connected!!')
         app.listen(3030)
-        
     })
     .catch((err) => console.log(err))
