@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 app.use(auth)
 
 app.put('/post-image', (req, res, next) => {
-    console.log('Reached the image', req.body, req.file)
+    console.log('Reached the image', req.body.image, req.file)
     if (!req.Auth) {
         throw new Error('Not authenticated!')
     }
@@ -65,14 +65,16 @@ app.put('/post-image', (req, res, next) => {
         res.status(200).json({ message: 'No file uploaded' })
     }
 
-    if (req.body.image) {
-        console.log('the old image', req.body.oldImage, 'the req image is', req.body.image)
+    if (req.body.oldImage) {
+        console.log('the old req image is', req.body.image)
         deleteFile.deleteFile(req.body.oldImage)
-        res.status(201).json({
-            message: 'Image uploaded successfully',
-            filePath: req.body.oldImage,
-        })
+        
     }
+
+    return res.status(201).json({
+        message: 'Image uploaded successfully',
+        filePath: req.file.path,
+    })
 })
 
 app.use(

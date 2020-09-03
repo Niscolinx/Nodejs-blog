@@ -165,10 +165,10 @@ class Feed extends Component {
         formData.append('image', postData.image)
 
         if(this.state.editPost){
-            formData.append('oldImage', postData.image)
+            formData.append('oldImage', this.state.editPost.imagePath)
         }
 
-        console.log('the imaage', formData)
+        console.log('the image', formData)
         fetch('http://localhost:3030/post-image', {
             method : 'PUT',
             headers: {
@@ -178,14 +178,14 @@ class Feed extends Component {
         }).then(res => {
             return res.json()
         }).then(result => {
-
-            console.log('the result of the image', result)
+            const imageUrl = result.filePath
+            console.log('the result of the image', imageUrl)
             const graphqlQuery = {
                 query: `
                 mutation { createPost(postData: {
                         title: "${postData.title}",
                         content: "${postData.content}",
-                        imageUrl: "${result.filePath}"
+                        imageUrl: "${imageUrl}"
                     }){
                         _id
                         title
@@ -237,6 +237,7 @@ class Feed extends Component {
                     content: createdPost.content,
                     creator: createdPost.creator.username,
                     createdAt: createdPost.createdAt,
+                    imagePath: createdPost.imageUrl
                 }
                 this.setState((prevState) => {
 
