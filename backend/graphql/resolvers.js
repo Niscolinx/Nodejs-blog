@@ -193,7 +193,7 @@ module.exports = {
             page = 1
         }
 
-        const perPage = 2
+        const perPage = 1
         const totalPosts = await Post.find().countDocuments()
         const posts = await Post.find()
             .sort({ createdAt: -1 })
