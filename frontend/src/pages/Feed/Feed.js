@@ -73,6 +73,7 @@ class Feed extends Component {
                             }   
                         }
                     totalPosts
+                    lastPage
                   }
                 }`,
         }
@@ -339,7 +340,6 @@ class Feed extends Component {
                     ) : null}
                     {!this.state.postsLoading && (
                         <Paginator
-                            justLoad='Just loading'
                             onPrevious={this.loadPosts.bind(this, 'previous')}
                             onNext={this.loadPosts.bind(this, 'next')}
                             lastPage={Math.ceil(

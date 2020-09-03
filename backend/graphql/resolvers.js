@@ -202,8 +202,6 @@ module.exports = {
 
         const lastPage = perPage
 
-        console.log('the last page', lastPage)
-
         return {
             Post: posts.map((p) => {
                 return {

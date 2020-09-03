@@ -4,7 +4,6 @@ import './Paginator.css';
 
 const paginator = props => (
   <div className="paginator">
-  <div>{props.justLoad}</div>
     {props.children}
     <div className="paginator__controls">
       {props.currentPage > 1 && (
