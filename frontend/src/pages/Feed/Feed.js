@@ -162,42 +162,54 @@ class Feed extends Component {
 
     finishEditHandler = (postData) => {
         const formData = new FormData()
-        formData.append('title', postData.title)
-        formData.append('content', postData.content)
         formData.append('image', postData.image)
 
-        const graphqlQuery = {
-            query: `
-            mutation { createPost(postData: {
-                    title: "${postData.title}",
-                    content: "${postData.content}",
-                    imageUrl: "Image url"
-                }){
-                    _id
-                    title
-                    content
-                    imageUrl
-                    creator {
-                        username
-                    }
-                    createdAt
-                }
-            }`,
-        }
-
-        this.setState({
-            editLoading: true,
-        })
-        // Set up data (with image!)
-
-        fetch('http://localhost:3030/graphql', {
-            method: 'POST',
-            body: JSON.stringify(graphqlQuery),
+        fetch('http://localhost:3030/post-image', {
+            method : 'PUT',
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + this.props.token,
+                Authorization: 'Bearer ' + this.props.token
             },
+            body: JSON.stringify(formData)
+        }).then(res => {
+            return res.json()
+        }).then(result => {
+
+            console.log('the result of the image', result)
+            const graphqlQuery = {
+                query: `
+                mutation { createPost(postData: {
+                        title: "${postData.title}",
+                        content: "${postData.content}",
+                        imageUrl: "${result.filePath}"
+                    }){
+                        _id
+                        title
+                        content
+                        imageUrl
+                        creator {
+                            username
+                        }
+                        createdAt
+                    }
+                }`,
+            }
+    
+            this.setState({
+                editLoading: true,
+                imagePath: result.filePath
+            })
+            // Set up data (with image!)
+    
+           return fetch('http://localhost:3030/graphql', {
+                method: 'POST',
+                body: JSON.stringify(graphqlQuery),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + this.props.token,
+                },
+            })
         })
+
             .then((res) => {
                 return res.json()
             })
