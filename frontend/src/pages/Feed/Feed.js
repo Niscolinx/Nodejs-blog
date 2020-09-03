@@ -100,6 +100,7 @@ class Feed extends Component {
                         }
                     }),
                     totalPosts: fetchedPosts.totalPosts,
+                    lastPage: fetchedPosts.lastPage
                     postsLoading: false,
                 })
 
@@ -173,6 +174,7 @@ class Feed extends Component {
                     _id
                     title
                     content
+                    imageUrl
                     creator {
                         username
                     }
@@ -200,6 +202,12 @@ class Feed extends Component {
             .then((resData) => {
                 const createdPost = resData.data.createPost
 
+                 if (resData.errors && resData.errors[0].status === 422) {
+                     throw new Error(
+                         "Validation failed. Make sure the email address isn't used yet!"
+                     )
+                 }
+
                 if (resData.errors) {
                     throw new Error('Creating or editing a post failed!')
                 }
@@ -218,7 +226,7 @@ class Feed extends Component {
                     if(prevState.editPost){
 
                         const findIndex = prevState.posts.findIndex(p => {
-                           return prevState.editPost._id === p._id
+                           return p._id === prevState.editPost._id
                         })
 
                         updatedPosts[findIndex] = post
@@ -330,6 +338,7 @@ class Feed extends Component {
                     ) : null}
                     {!this.state.postsLoading && (
                         <Paginator
+                            justLoad='Just loading'
                             onPrevious={this.loadPosts.bind(this, 'previous')}
                             onNext={this.loadPosts.bind(this, 'next')}
                             lastPage={Math.ceil(
@@ -347,10 +356,10 @@ class Feed extends Component {
                                             post.createdAt
                                         ).toLocaleDateString('en-US')}
                                         title={post.title}
-                                        image={
-                                            'http://localhost:3030/' +
-                                            post.imageUrl
-                                        }
+                                        // image={
+                                        //     'http://localhost:3030/' +
+                                        //     post.imageUrl
+                                        // }
                                         content={post.content}
                                         onStartEdit={this.startEditPostHandler.bind(
                                             this,
