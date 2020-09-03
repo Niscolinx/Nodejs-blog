@@ -89,6 +89,7 @@ class Feed extends Component {
             })
             .then((resData) => {
                 const fetchedPosts = resData.data.getPosts
+                console.log('the res data', fetchedPosts)
                 if (resData.errors) {
                     throw new Error('Failed to Load posts.')
                 }
@@ -100,7 +101,7 @@ class Feed extends Component {
                         }
                     }),
                     totalPosts: fetchedPosts.totalPosts,
-                    lastPage: fetchedPosts.lastPage
+                    lastPage: fetchedPosts.lastPage,
                     postsLoading: false,
                 })
 

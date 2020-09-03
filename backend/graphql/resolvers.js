@@ -181,7 +181,6 @@ module.exports = {
     },
 
     getPosts: async function ({ page }, req) {
-        console.log('Reached the get posts', page)
 
         if (!req.Auth) {
             const err = new Error('Not authenticated')
@@ -201,7 +200,9 @@ module.exports = {
             .limit(perPage)
             .populate('creator')
 
-        console.log('the posts', posts)
+        const lastPage = perPage
+
+        console.log('the last page', lastPage)
 
         return {
             Post: posts.map((p) => {
@@ -213,6 +214,7 @@ module.exports = {
                 }
             }),
             totalPosts,
+            lastPage,
         }
     },
 }

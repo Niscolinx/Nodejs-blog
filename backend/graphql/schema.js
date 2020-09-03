@@ -46,6 +46,7 @@ module.exports = buildSchema(`
     type PostData {
         Post: [Post!]!
         totalPosts: Int!
+        lastPage: Int
     }
 
     type rootQuery{
