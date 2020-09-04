@@ -215,4 +215,28 @@ module.exports = {
             lastPage,
         }
     },
+
+    Post: async function({id}, req){
+
+          if (!req.Auth) {
+              const err = new Error('Not authenticated')
+              err.statusCode = 403
+              throw err
+          }
+
+          const post = await Post.findById(id)
+
+          if(!post){
+              const error = new Error('No post was found!')
+              error.statusCode = 404
+              throw error
+          }
+
+          return {
+              ...post._doc,
+              _id: post._id.toString(),
+              createdAt: post.createdAt.toISOString(),
+              updateAt: post.updateAt.toISOString(),
+          }
+    }
 }

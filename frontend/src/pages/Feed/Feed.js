@@ -179,7 +179,6 @@ class Feed extends Component {
             return res.json()
         }).then(result => {
             const imageUrl = result.filePath
-            console.log('the result of the image', imageUrl)
             const graphqlQuery = {
                 query: `
                 mutation { createPost(postData: {
