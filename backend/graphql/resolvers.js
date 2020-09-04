@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Post = require('../models/post')
 
+const fileDelete = require('../utility/deleteFile')
+
 module.exports = {
     createUser: async function ({ userData }, req) {
         const error = []
@@ -242,6 +244,49 @@ module.exports = {
         }
     },
 
+    deletePost: async function ({ id }, req) {
+
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
+
+        const postToDelete = await Post.findById(id).populate('creator')
+
+
+        if (!postToDelete) {
+            const error = new Error('Post not found!')
+            error.statusCode = 404
+            throw error
+        }
+
+        if (postToDelete.creator._id.toString() !== req.userId.toString()) {
+            const error = new Error('Not authorized')
+            error.statusCode = 403
+            throw error
+        }
+        let imageUrl
+        if (postToDelete.imageUrl) {
+            imageUrl = postToDelete.imageUrl
+        }
+        const deletedPost = await Post.findOneAndDelete(id)
+
+        if (imageUrl) {
+            fileDelete.deleteFile(imageUrl)
+        }
+
+
+        const userOfDeletedPost = await User.findById(deletedPost.creator)
+
+
+        userOfDeletedPost.posts.pull(deletedPost._id)
+
+        userOfDeletedPost.save()
+
+        return true
+    },
+
     getPosts: async function ({ page }, req) {
         if (!req.Auth) {
             const err = new Error('Not authenticated')
@@ -287,7 +332,7 @@ module.exports = {
         const post = await Post.findById(id).populate('creator')
 
         if (!post) {
-            const error = new Error('No post was found!')
+            const error = new Error('post not found!')
             error.statusCode = 404
             throw error
         }

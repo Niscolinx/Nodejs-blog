@@ -23,7 +23,6 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-
         fetch('', {
             method: 'POST',
             headers: {
@@ -94,17 +93,16 @@ class Feed extends Component {
                     throw new Error('Failed to Load posts.')
                 }
                 this.setState({
-                    posts: fetchedPosts.Post.map(p => {
+                    posts: fetchedPosts.Post.map((p) => {
                         return {
                             ...p,
-                            imagePath: p.imageUrl
+                            imagePath: p.imageUrl,
                         }
                     }),
                     totalPosts: fetchedPosts.totalPosts,
                     lastPage: fetchedPosts.lastPage,
                     postsLoading: false,
                 })
-
             })
             .catch(this.catchError)
     }
@@ -160,32 +158,27 @@ class Feed extends Component {
 
     finishEditHandler = (postData) => {
         const formData = new FormData()
-        
-        console.log('this state', this.state)
-        console.log('this postData', postData)
+
         formData.append('image', postData.image)
-        if(this.state.editPost){
+        if (this.state.editPost) {
             formData.append('oldImage', this.state.editPost.imagePath)
         }
-      
-
-        console.log('the image', formData)
-        console.log('the state', this.state)
 
         fetch('http://localhost:3030/post-image', {
-            method : 'PUT',
+            method: 'PUT',
             headers: {
-                Authorization: 'Bearer ' + this.props.token
+                Authorization: 'Bearer ' + this.props.token,
             },
-            body: formData
-        }).then(res => {
-            return res.json()
+            body: formData,
+        })
+            .then((res) => {
+                return res.json()
+            })
+            .then((result) => {
+                const imageUrl = result.filePath
 
-        }).then(result => {
-            const imageUrl = result.filePath
-
-            let graphqlQuery = {
-                query: `
+                let graphqlQuery = {
+                    query: `
                     mutation { createPost(postData: {
                             title: "${postData.title}",
                             content: "${postData.content}",
@@ -202,11 +195,11 @@ class Feed extends Component {
                         }
                     }
                 `,
-            }
+                }
 
-            if(this.state.editPost){
-                 graphqlQuery = {
-                     query: `
+                if (this.state.editPost) {
+                    graphqlQuery = {
+                        query: `
                         mutation { updatePost( id: "${this.state.editPost._id}", postData: {
                                 title: "${postData.title}",
                                 content: "${postData.content}",
@@ -223,23 +216,23 @@ class Feed extends Component {
                             }
                         }
                     `,
-                 }
-            }
-    
-            this.setState({
-                editLoading: true,
-                imagePath: result.filePath
+                    }
+                }
+
+                this.setState({
+                    editLoading: true,
+                    imagePath: result.filePath,
+                })
+
+                return fetch('http://localhost:3030/graphql', {
+                    method: 'POST',
+                    body: JSON.stringify(graphqlQuery),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + this.props.token,
+                    },
+                })
             })
-    
-           return fetch('http://localhost:3030/graphql', {
-                method: 'POST',
-                body: JSON.stringify(graphqlQuery),
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + this.props.token,
-                },
-            })
-        })
 
             .then((res) => {
                 return res.json()
@@ -250,41 +243,37 @@ class Feed extends Component {
                 if (this.state.editPost) {
                     queryToPost = 'updatePost'
                 }
-                
+
                 const postQuery = resData.data[queryToPost]
 
-                 if (resData.errors && resData.errors[0].status === 422) {
-                     throw new Error(
-                         "Validation failed. Make sure the email address isn't used yet!"
-                     )
-                 }
+                if (resData.errors && resData.errors[0].status === 422) {
+                    throw new Error(
+                        "Validation failed. Make sure the email address isn't used yet!"
+                    )
+                }
 
                 if (resData.errors) {
                     throw new Error('Creating or editing a post failed!')
                 }
 
-                
                 const post = {
                     _id: postQuery._id,
                     title: postQuery.title,
                     content: postQuery.content,
                     creator: postQuery.creator.username,
                     createdAt: postQuery.createdAt,
-                    imagePath: postQuery.imageUrl
+                    imagePath: postQuery.imageUrl,
                 }
                 this.setState((prevState) => {
-
                     const updatedPosts = [...prevState.posts]
 
-                    if(prevState.editPost){
-
-                        const findIndex = prevState.posts.findIndex(p => {
-                           return p._id === prevState.editPost._id
+                    if (prevState.editPost) {
+                        const findIndex = prevState.posts.findIndex((p) => {
+                            return p._id === prevState.editPost._id
                         })
 
                         updatedPosts[findIndex] = post
-                    }
-                    else{
+                    } else {
                         updatedPosts.pop()
                         updatedPosts.unshift(post)
                     }
@@ -313,19 +302,31 @@ class Feed extends Component {
 
     deletePostHandler = (postId) => {
         this.setState({ postsLoading: true })
-        fetch('http://localhost:3030/feed/post/' + postId, {
-            method: 'DELETE',
+
+
+        const graphqlQuery = {
+            query: `
+                mutation {
+                    deletePost(id: "${postId}")
+                }
+            `,
+        }
+        fetch('http://localhost:3030/graphql', {
+            method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
-                if (res.status !== 200 && res.status !== 201) {
-                    throw new Error('Deleting a post failed!')
-                }
                 return res.json()
             })
             .then((resData) => {
+                console.log('the deleted post', resData)
+                if (resData.status !== 200) {
+                    throw new Error('Deleting a post failed!')
+                }
                 this.loadPosts()
             })
             .catch((err) => {
