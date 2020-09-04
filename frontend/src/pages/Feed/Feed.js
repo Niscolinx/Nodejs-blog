@@ -177,11 +177,11 @@ class Feed extends Component {
             body: formData
         }).then(res => {
             return res.json()
-            
+
         }).then(result => {
             const imageUrl = result.filePath
 
-            const graphqlQuery = {
+            let graphqlQuery = {
                 query: `
                 mutation { createPost(postData: {
                         title: "${postData.title}",
@@ -199,12 +199,32 @@ class Feed extends Component {
                     }
                 }`,
             }
+
+            if(this.state.editPost){
+                 graphqlQuery = {
+                    query: `
+                        mutation { updatePost(postData: {
+                                title: "${postData.title}",
+                                content: "${postData.content}",
+                                imageUrl: "${imageUrl}"
+                            }){
+                                _id
+                                title
+                                content
+                                imageUrl
+                                creator {
+                                    username
+                                }
+                                createdAt
+                            }
+                        }`,
+                    }
+            }
     
             this.setState({
                 editLoading: true,
                 imagePath: result.filePath
             })
-            // Set up data (with image!)
     
            return fetch('http://localhost:3030/graphql', {
                 method: 'POST',
@@ -220,7 +240,13 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                const createdPost = resData.data.createPost
+
+                let queryToPost = 'createdPost'
+
+                if (this.state.editPost) {
+                    queryToPost = 'updatePost'
+                }
+                const postQuery = resData.data[queryToPost]
 
                  if (resData.errors && resData.errors[0].status === 422) {
                      throw new Error(
@@ -232,13 +258,14 @@ class Feed extends Component {
                     throw new Error('Creating or editing a post failed!')
                 }
 
+                
                 const post = {
-                    _id: createdPost._id,
-                    title: createdPost.title,
-                    content: createdPost.content,
-                    creator: createdPost.creator.username,
-                    createdAt: createdPost.createdAt,
-                    imagePath: createdPost.imageUrl
+                    _id: postQuery._id,
+                    title: postQuery.title,
+                    content: postQuery.content,
+                    creator: postQuery.creator.username,
+                    createdAt: postQuery.createdAt,
+                    imagePath: postQuery.imageUrl
                 }
                 this.setState((prevState) => {
 

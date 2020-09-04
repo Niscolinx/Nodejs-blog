@@ -15,9 +15,9 @@ class SinglePost extends Component {
     componentDidMount() {
         const postId = this.props.match.params.postId
 
-        const graphqlQuery ={
-            query: `
-                post(id: ${postId}){
+        const graphqlQuery = {
+            query: `{
+                post(id: "${postId}"){
                     title
                     content
                     imageUrl
@@ -26,13 +26,15 @@ class SinglePost extends Component {
                         username
                     }
                 }
-            `
+            }`,
         }
         fetch('http://localhost:3030/graphql', {
+            method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
                 return res.json()
@@ -41,9 +43,9 @@ class SinglePost extends Component {
                 console.log('the res data', resData)
 
                 const fetchedPost = resData.data.post
-                    if (resData.errors) {
-                        throw new Error('Failed to fetch Post')
-                    }
+                if (resData.errors) {
+                    throw new Error('Failed to fetch Post')
+                }
                 let image = 'http://localhost:3030/' + fetchedPost.imageUrl
                 this.setState({
                     title: fetchedPost.title,

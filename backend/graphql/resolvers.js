@@ -68,6 +68,56 @@ module.exports = {
         }
     },
 
+    login: async function ({ email, password }) {
+        const error = []
+        if (!validator.isEmail(email) || validator.isEmpty(email)) {
+            error.push({ message: 'Invalid Email Field' })
+        }
+
+        if (
+            !validator.isLength(password, { min: 5 }) ||
+            validator.isEmpty(password)
+        ) {
+            error.push({
+                message: 'Password must be at least 5 characters long',
+            })
+        }
+
+        if (error.length > 0) {
+            const err = new Error('Invalid User Input')
+            err.statusCode = 422
+            err.data = error
+            throw err
+        }
+
+        const userExits = await User.findOne({ email })
+
+        if (!userExits) {
+            const error = new Error('User does not exist')
+            error.statusCode = 401
+            throw error
+        }
+
+        const checkPassword = await bcrypt.compare(password, userExits.password)
+
+        if (!checkPassword) {
+            const error = new Error('Incorrect Password')
+            error.statusCode = 401
+            throw error
+        }
+
+        const token = jwt.sign(
+            { email: userExits.email, userId: userExits._id.toString() },
+            'supersecretkey',
+            { expiresIn: '1hr' }
+        )
+
+        return {
+            userId: userExits._id.toString(),
+            token,
+        }
+    },
+
     createPost: async function ({ postData }, req) {
         const error = []
 
@@ -129,54 +179,66 @@ module.exports = {
             updatedAt: savePost.updatedAt.toISOString(),
         }
     },
-
-    login: async function ({ email, password }) {
+    updatePost: async function ({ id, postData }, req) {
         const error = []
-        if (!validator.isEmail(email) || validator.isEmpty(email)) {
-            error.push({ message: 'Invalid Email Field' })
-        }
 
         if (
-            !validator.isLength(password, { min: 5 }) ||
-            validator.isEmpty(password)
+            !validator.isLength(postData.title, { min: 5 }) ||
+            validator.isEmpty(postData.title)
         ) {
             error.push({
-                message: 'Password must be at least 5 characters long',
+                message: 'title must be at least 5 characters long',
+            })
+        }
+        if (
+            !validator.isLength(postData.content, { min: 5 }) ||
+            validator.isEmpty(postData.content)
+        ) {
+            error.push({
+                message: 'Content must be at least 5 characters long',
             })
         }
 
         if (error.length > 0) {
-            const err = new Error('Invalid User Input')
+            const err = new Error('Invalid post data')
             err.statusCode = 422
             err.data = error
             throw err
         }
 
-        const userExits = await User.findOne({ email })
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
 
-        if (!userExits) {
-            const error = new Error('User does not exist')
-            error.statusCode = 401
+        const post = await Post.findById(id).populate('creator')
+
+        if (!post) {
+            const error = new Error('Post was not found!')
+            error.statusCode = 404
             throw error
         }
 
-        const checkPassword = await bcrypt.compare(password, userExits.password)
-
-        if (!checkPassword) {
-            const error = new Error('Incorrect Password')
-            error.statusCode = 401
+        if (post.creator._id.toString() !== req.userId.toString()) {
+            const error = new Error('Not authorized!')
+            error.statusCode = 403
             throw error
         }
 
-        const token = jwt.sign(
-            { email: userExits.email, userId: userExits._id.toString() },
-            'supersecretkey',
-            { expiresIn: '1hr' }
-        )
+        post.title = postData.title
+        post.content = postData.content
+        if (postData.imageUrl !== 'undefined') {
+            post.imageUrl = postData.imageUrl
+        }
+
+        const updatedPost = await Post.save()
 
         return {
-            userId: userExits._id.toString(),
-            token,
+            ...updatedPost,
+            _id: updatedPost._id.toString(),
+            createdAt: updatedPost.createdAt.toISOString(),
+            updatedAt: updatedPost.updatedAt.toISOString(),
         }
     },
 
@@ -215,7 +277,7 @@ module.exports = {
         }
     },
 
-    Post: async function ({ id }, req) {
+    post: async function ({ id }, req) {
         if (!req.Auth) {
             const err = new Error('Not authenticated')
             err.statusCode = 403
@@ -223,8 +285,6 @@ module.exports = {
         }
 
         const post = await Post.findById(id).populate('creator')
-
-        console.log('the single post', post)
 
         if (!post) {
             const error = new Error('No post was found!')
@@ -234,9 +294,8 @@ module.exports = {
 
         return {
             ...post._doc,
-            _id: post._id.toString(),
             createdAt: post.createdAt.toISOString(),
-            updateAt: post.updateAt.toISOString(),
+            updatedAt: post.updatedAt.toISOString(),
         }
     },
 }
