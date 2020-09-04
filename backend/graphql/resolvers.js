@@ -181,7 +181,6 @@ module.exports = {
     },
 
     getPosts: async function ({ page }, req) {
-
         if (!req.Auth) {
             const err = new Error('Not authenticated')
             err.statusCode = 403
@@ -216,27 +215,28 @@ module.exports = {
         }
     },
 
-    Post: async function({id}, req){
+    Post: async function ({ id }, req) {
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
 
-          if (!req.Auth) {
-              const err = new Error('Not authenticated')
-              err.statusCode = 403
-              throw err
-          }
+        const post = await Post.findById(id).populate('creator')
 
-          const post = await Post.findById(id)
+        console.log('the single post', post)
 
-          if(!post){
-              const error = new Error('No post was found!')
-              error.statusCode = 404
-              throw error
-          }
+        if (!post) {
+            const error = new Error('No post was found!')
+            error.statusCode = 404
+            throw error
+        }
 
-          return {
-              ...post._doc,
-              _id: post._id.toString(),
-              createdAt: post.createdAt.toISOString(),
-              updateAt: post.updateAt.toISOString(),
-          }
-    }
+        return {
+            ...post._doc,
+            _id: post._id.toString(),
+            createdAt: post.createdAt.toISOString(),
+            updateAt: post.updateAt.toISOString(),
+        }
+    },
 }

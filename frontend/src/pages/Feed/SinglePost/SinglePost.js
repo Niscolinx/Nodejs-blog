@@ -14,28 +14,45 @@ class SinglePost extends Component {
 
     componentDidMount() {
         const postId = this.props.match.params.postId
-        fetch('http://localhost:3030/feed/post/' + postId, {
+
+        const graphqlQuery ={
+            query: `
+                post(id: ${postId}){
+                    title
+                    content
+                    imageUrl
+                    createdAt
+                    creator {
+                        username
+                    }
+                }
+            `
+        }
+        fetch('http://localhost:3030/graphql', {
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
+                'Content-Type': 'application/json',
             },
         })
             .then((res) => {
-                if (res.status !== 200) {
-                    throw new Error('Failed to fetch status')
-                }
                 return res.json()
             })
             .then((resData) => {
-              
-                let image = 'http://localhost:3030/' + resData.post.imageUrl
+                console.log('the res data', resData)
+
+                const fetchedPost = resData.data.post
+                    if (resData.errors) {
+                        throw new Error('Failed to fetch Post')
+                    }
+                let image = 'http://localhost:3030/' + fetchedPost.imageUrl
                 this.setState({
-                    title: resData.post.title,
-                    author: resData.post.creator.name,
+                    title: fetchedPost.title,
+                    author: fetchedPost.creator.username,
                     image: image,
-                    date: new Date(resData.post.createdAt).toLocaleDateString(
+                    date: new Date(fetchedPost.createdAt).toLocaleDateString(
                         'en-US'
                     ),
-                    content: resData.post.content,
+                    content: fetchedPost.content,
                 })
             })
             .catch((err) => {

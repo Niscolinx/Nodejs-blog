@@ -177,8 +177,10 @@ class Feed extends Component {
             body: formData
         }).then(res => {
             return res.json()
+            
         }).then(result => {
             const imageUrl = result.filePath
+
             const graphqlQuery = {
                 query: `
                 mutation { createPost(postData: {
