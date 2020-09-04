@@ -23,7 +23,6 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-        console.log('the state is ', this.state)
 
         fetch('', {
             method: 'POST',
@@ -106,7 +105,6 @@ class Feed extends Component {
                     postsLoading: false,
                 })
 
-                console.log('the state is ', this.state)
             })
             .catch(this.catchError)
     }
@@ -169,6 +167,8 @@ class Feed extends Component {
         }
 
         console.log('the image', formData)
+        console.log('the state', this.state)
+
         fetch('http://localhost:3030/post-image', {
             method : 'PUT',
             headers: {
@@ -183,27 +183,28 @@ class Feed extends Component {
 
             let graphqlQuery = {
                 query: `
-                mutation { createPost(postData: {
-                        title: "${postData.title}",
-                        content: "${postData.content}",
-                        imageUrl: "${imageUrl}"
-                    }){
-                        _id
-                        title
-                        content
-                        imageUrl
-                        creator {
-                            username
+                    mutation { createPost(postData: {
+                            title: "${postData.title}",
+                            content: "${postData.content}",
+                            imageUrl: "${imageUrl}"
+                        }){
+                            _id
+                            title
+                            content
+                            imageUrl
+                            creator {
+                                username
+                            }
+                            createdAt
                         }
-                        createdAt
                     }
-                }`,
+                `,
             }
 
             if(this.state.editPost){
                  graphqlQuery = {
-                    query: `
-                        mutation { updatePost(postData: {
+                     query: `
+                        mutation { updatePost( id: "${this.state.editPost._id}", postData: {
                                 title: "${postData.title}",
                                 content: "${postData.content}",
                                 imageUrl: "${imageUrl}"
@@ -217,8 +218,9 @@ class Feed extends Component {
                                 }
                                 createdAt
                             }
-                        }`,
-                    }
+                        }
+                    `,
+                 }
             }
     
             this.setState({
@@ -241,12 +243,16 @@ class Feed extends Component {
             })
             .then((resData) => {
 
+                console.log('the res data', resData)
                 let queryToPost = 'createdPost'
 
                 if (this.state.editPost) {
                     queryToPost = 'updatePost'
                 }
+                console.log('the post query', queryToPost)
+
                 const postQuery = resData.data[queryToPost]
+
 
                  if (resData.errors && resData.errors[0].status === 422) {
                      throw new Error(

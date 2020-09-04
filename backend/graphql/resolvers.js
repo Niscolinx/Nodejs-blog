@@ -180,6 +180,8 @@ module.exports = {
         }
     },
     updatePost: async function ({ id, postData }, req) {
+
+        console.log('Reached the update post')
         const error = []
 
         if (
