@@ -160,11 +160,14 @@ class Feed extends Component {
 
     finishEditHandler = (postData) => {
         const formData = new FormData()
+        
+        console.log('this state', this.state)
+        console.log('this postData', postData)
         formData.append('image', postData.image)
-
         if(this.state.editPost){
             formData.append('oldImage', this.state.editPost.imagePath)
         }
+      
 
         console.log('the image', formData)
         console.log('the state', this.state)
@@ -242,17 +245,13 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-
-                console.log('the res data', resData)
-                let queryToPost = 'createdPost'
+                let queryToPost = 'createPost'
 
                 if (this.state.editPost) {
                     queryToPost = 'updatePost'
                 }
-                console.log('the post query', queryToPost)
-
+                
                 const postQuery = resData.data[queryToPost]
-
 
                  if (resData.errors && resData.errors[0].status === 422) {
                      throw new Error(

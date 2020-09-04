@@ -170,7 +170,7 @@ module.exports = {
 
         user.posts.push(savePost)
 
-        const savedUser = await user.save()
+        await user.save()
 
         return {
             ...savePost._doc,
@@ -180,8 +180,6 @@ module.exports = {
         }
     },
     updatePost: async function ({ id, postData }, req) {
-
-        console.log('Reached the update post')
         const error = []
 
         if (
@@ -234,10 +232,10 @@ module.exports = {
             post.imageUrl = postData.imageUrl
         }
 
-        const updatedPost = await Post.save()
+        const updatedPost = await post.save()
 
         return {
-            ...updatedPost,
+            ...updatedPost._doc,
             _id: updatedPost._id.toString(),
             createdAt: updatedPost.createdAt.toISOString(),
             updatedAt: updatedPost.updatedAt.toISOString(),
