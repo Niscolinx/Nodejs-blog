@@ -88,7 +88,7 @@ class Feed extends Component {
             })
             .then((resData) => {
                 const fetchedPosts = resData.data.getPosts
-                console.log('the res data', fetchedPosts)
+                console.log('the fetched posts', fetchedPosts)
                 if (resData.errors) {
                     throw new Error('Failed to Load posts.')
                 }
@@ -323,8 +323,7 @@ class Feed extends Component {
                 return res.json()
             })
             .then((resData) => {
-                console.log('the deleted post', resData)
-                if (resData.status !== 200) {
+                if (resData.errors) {
                     throw new Error('Deleting a post failed!')
                 }
                 this.loadPosts()
