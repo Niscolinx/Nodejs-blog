@@ -120,6 +120,28 @@ module.exports = {
         }
     },
 
+    getUser: async function(arg, req){
+        console.log('Reached the get user')
+          if (!req.Auth) {
+              const err = new Error('Not authenticated')
+              err.statusCode = 403
+              throw err
+          }
+        const user = await User.findById(req.userId)
+
+        if(!user){
+            const error = new Error('User not found')
+            error.statusCode = 404
+            throw error
+        }
+
+        return {
+            ...user._doc,
+            _id: user._id.toString()
+        }
+
+    },
+
     createPost: async function ({ postData }, req) {
         const error = []
 
@@ -304,11 +326,14 @@ module.exports = {
 
         const lastPage = perPage
 
+        console.log('the posts', posts)
+
         return {
             Post: posts.map((p) => {
                 return {
                     ...p._doc,
                     _id: p._id.toString(),
+                    status: p.creator.status,
                     createdAt: p.createdAt.toISOString(),
                     updatedAt: p.updatedAt.toISOString(),
                 }

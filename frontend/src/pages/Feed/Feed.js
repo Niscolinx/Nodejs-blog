@@ -23,21 +23,32 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-        fetch('', {
+
+        const graphqlQuery = {
+            query: `{
+                getUser {
+                    status
+                }
+            }`
+        }
+        fetch('http://localhost:3030/graphql', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
             },
+            body: JSON.stringify(graphqlQuery)
+
         })
             .then((res) => {
                 return res.json()
             })
             .then((resData) => {
-                if (resData.status !== 200) {
+                console.log('the status', resData)
+                if (resData.errors) {
                     throw new Error('Failed to fetch user status.')
                 }
-                this.setState({ status: resData.status })
+                this.setState({ status: resData.data.getUser.status })
             })
             .catch(this.catchError)
 
@@ -88,6 +99,8 @@ class Feed extends Component {
             })
             .then((resData) => {
                 const fetchedPosts = resData.data.getPosts
+
+                console.log('the fetched status', fetchedPosts)
                 if (resData.errors) {
                     throw new Error('Failed to Load posts.')
                 }
@@ -110,14 +123,14 @@ class Feed extends Component {
         event.preventDefault()
 
         const graphqlQuery = {
-            query : `
+            query: `
                 mutation {
                     updateStatus(updatedStatus: "${this.state.status}"){
                         email
                         status
                     }
                 }
-            `
+            `,
         }
         fetch('http://localhost:3030/graphql', {
             method: 'POST',
@@ -128,15 +141,13 @@ class Feed extends Component {
             body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
-               
                 return res.json()
             })
             .then((resData) => {
-
                 console.log('the res data of update status', resData)
-                 if (resData.errors) {
-                     throw new Error("Can't update status!")
-                 }
+                if (resData.errors) {
+                    throw new Error("Can't update status!")
+                }
                 this.setState({
                     status: resData.data.updateStatus.status,
                     user: resData.data.updateStatus.email,
@@ -315,7 +326,6 @@ class Feed extends Component {
 
     deletePostHandler = (postId) => {
         this.setState({ postsLoading: true })
-
 
         const graphqlQuery = {
             query: `

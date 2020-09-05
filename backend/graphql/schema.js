@@ -57,6 +57,7 @@ module.exports = buildSchema(`
         login(email: String, password: String): AuthData!
         getPosts(page: Int): PostData!
         post(id: ID!): Post!
+        getUser: User!
     }
 
     schema {
