@@ -245,7 +245,6 @@ module.exports = {
     },
 
     deletePost: async function ({ id }, req) {
-
         if (!req.Auth) {
             const err = new Error('Not authenticated')
             err.statusCode = 403
@@ -253,7 +252,6 @@ module.exports = {
         }
 
         const postToDelete = await Post.findById(id).populate('creator')
-
 
         if (!postToDelete) {
             const error = new Error('Post not found!')
@@ -276,9 +274,7 @@ module.exports = {
             fileDelete.deleteFile(imageUrl)
         }
 
-
         const userOfDeletedPost = await User.findById(deletedPost.creator)
-
 
         userOfDeletedPost.posts.pull(deletedPost._id)
 
@@ -341,6 +337,24 @@ module.exports = {
             ...post._doc,
             createdAt: post.createdAt.toISOString(),
             updatedAt: post.updatedAt.toISOString(),
+        }
+    },
+
+    updateStatus: async function ({ updatedStatus }, req) {
+        console.log('Reached the update status')
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
+        const user = await User.findById(req.userId)
+
+        user.status = updatedStatus
+        const updatedUser = await user.save()
+
+        return {
+            ...updatedUser._doc,
+            _id: updatedUser._id.toString(),
         }
     },
 }

@@ -88,7 +88,6 @@ class Feed extends Component {
             })
             .then((resData) => {
                 const fetchedPosts = resData.data.getPosts
-                console.log('the fetched posts', fetchedPosts)
                 if (resData.errors) {
                     throw new Error('Failed to Load posts.')
                 }
@@ -109,27 +108,41 @@ class Feed extends Component {
 
     statusUpdateHandler = (event) => {
         event.preventDefault()
-        fetch('http://localhost:3030/feed/userStatus', {
-            method: 'PUT',
+
+        const graphqlQuery = {
+            query : `
+                mutation {
+                    updateStatus(updatedStatus: "${this.state.status}"){
+                        email
+                        status
+                    }
+                }
+            `
+        }
+        fetch('http://localhost:3030/graphql', {
+            method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                status: this.state.status,
-            }),
+            body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
-                if (res.status !== 200 && res.status !== 201) {
-                    throw new Error("Can't update status!")
-                }
+               
                 return res.json()
             })
             .then((resData) => {
+
+                console.log('the res data of update status', resData)
+                 if (resData.errors) {
+                     throw new Error("Can't update status!")
+                 }
                 this.setState({
-                    status: resData.updatedUser.status,
-                    user: resData.updatedUser.email,
+                    status: resData.data.updateStatus.status,
+                    user: resData.data.updateStatus.email,
                 })
+
+                console.log('the state', this.state)
             })
             .catch(this.catchError)
     }
@@ -343,6 +356,7 @@ class Feed extends Component {
     }
 
     render() {
+        console.log('the state of render', this.state)
         return (
             <Fragment>
                 <ErrorHandler
