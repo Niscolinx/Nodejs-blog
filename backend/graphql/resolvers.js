@@ -121,7 +121,6 @@ module.exports = {
     },
 
     getUser: async function(arg, req){
-        console.log('Reached the get user')
           if (!req.Auth) {
               const err = new Error('Not authenticated')
               err.statusCode = 403
@@ -325,8 +324,6 @@ module.exports = {
             .populate('creator')
 
         const lastPage = perPage
-
-        console.log('the posts', posts)
 
         return {
             Post: posts.map((p) => {
