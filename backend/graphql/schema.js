@@ -44,7 +44,7 @@ module.exports = buildSchema(`
         createPost(postData: PostInputData): Post!
         updatePost(id: ID!, postData: PostInputData): Post!
         deletePost(id: ID!): Boolean
-        updateStatus(updatedStatus: String!): User!
+        updateStatus(status: String!): User!
     }
 
     type PostData {

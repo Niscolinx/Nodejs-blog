@@ -362,7 +362,7 @@ module.exports = {
         }
     },
 
-    updateStatus: async function ({ updatedStatus }, req) {
+    updateStatus: async function ({ status }, req) {
         console.log('Reached the update status')
         if (!req.Auth) {
             const err = new Error('Not authenticated')
@@ -371,7 +371,7 @@ module.exports = {
         }
         const user = await User.findById(req.userId)
 
-        user.status = updatedStatus
+        user.status = status
         const updatedUser = await user.save()
 
         return {

@@ -125,7 +125,7 @@ class Feed extends Component {
         const graphqlQuery = {
             query: `
                 mutation {
-                    updateStatus(updatedStatus: "${this.state.status}"){
+                    updateStatus(status: "${this.state.status}"){
                         email
                         status
                     }
