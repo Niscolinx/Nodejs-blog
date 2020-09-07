@@ -105,6 +105,7 @@ module.exports = {
         if (!checkPassword) {
             const error = new Error('Incorrect Password')
             error.statusCode = 401
+            error.statusCode = 401
             throw error
         }
 
@@ -120,15 +121,15 @@ module.exports = {
         }
     },
 
-    getUser: async function(arg, req){
-          if (!req.Auth) {
-              const err = new Error('Not authenticated')
-              err.statusCode = 403
-              throw err
-          }
+    getUser: async function (arg, req) {
+        if (!req.Auth) {
+            const err = new Error('Not authenticated')
+            err.statusCode = 403
+            throw err
+        }
         const user = await User.findById(req.userId)
 
-        if(!user){
+        if (!user) {
             const error = new Error('User not found')
             error.statusCode = 404
             throw error
@@ -136,9 +137,8 @@ module.exports = {
 
         return {
             ...user._doc,
-            _id: user._id.toString()
+            _id: user._id.toString(),
         }
-
     },
 
     createPost: async function ({ postData }, req) {
