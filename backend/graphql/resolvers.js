@@ -105,7 +105,6 @@ module.exports = {
         if (!checkPassword) {
             const error = new Error('Incorrect Password')
             error.statusCode = 401
-            error.statusCode = 401
             throw error
         }
 
