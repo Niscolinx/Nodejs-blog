@@ -291,6 +291,7 @@ class Feed extends Component {
                 this.setState((prevState) => {
                     const updatedPosts = [...prevState.posts]
                     let updatedTotalPosts = prevState.totalPosts
+                    let updatedTotalPosts = prevState.totalPosts
 
                     if (prevState.editPost) {
                         const findIndex = prevState.posts.findIndex((p) => {
@@ -299,9 +300,11 @@ class Feed extends Component {
 
                         updatedPosts[findIndex] = post
                     } else {
-                        // if(prevState.totalPosts.length >= )
                         updatedTotalPosts++
-                        updatedPosts.pop()
+                        if(prevState.totalPosts.length >= prevState.lastPage){
+
+                            updatedPosts.pop()
+                        }
                         updatedPosts.unshift(post)
                     }
                     return {
