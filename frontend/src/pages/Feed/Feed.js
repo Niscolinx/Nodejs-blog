@@ -291,7 +291,6 @@ class Feed extends Component {
                 this.setState((prevState) => {
                     const updatedPosts = [...prevState.posts]
                     let updatedTotalPosts = prevState.totalPosts
-                    let updatedTotalPosts = prevState.totalPosts
 
                     if (prevState.editPost) {
                         const findIndex = prevState.posts.findIndex((p) => {
