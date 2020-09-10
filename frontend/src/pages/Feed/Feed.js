@@ -23,22 +23,20 @@ class Feed extends Component {
     }
 
     componentDidMount() {
-
         const graphqlQuery = {
             query: `{
                 getUser {
                     status
                 }
-            }`
+            }`,
         }
-        fetch('http://localhost:3030/graphql', {
+        fetch('https://mynode-blog.herokuapp.com//graphql', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + this.props.token,
             },
-            body: JSON.stringify(graphqlQuery)
-
+            body: JSON.stringify(graphqlQuery),
         })
             .then((res) => {
                 return res.json()
@@ -86,7 +84,7 @@ class Feed extends Component {
                   }
                 }`,
         }
-        fetch('http://localhost:3030/graphql', {
+        fetch('https://mynode-blog.herokuapp.com//graphql', {
             method: 'POST',
             body: JSON.stringify(graphqlQuery),
             headers: {
@@ -132,7 +130,7 @@ class Feed extends Component {
                 }
             `,
         }
-        fetch('http://localhost:3030/graphql', {
+        fetch('https://mynode-blog.herokuapp.com//graphql', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -188,7 +186,7 @@ class Feed extends Component {
             formData.append('oldImage', this.state.editPost.imagePath)
         }
 
-        fetch('http://localhost:3030/post-image', {
+        fetch('https://mynode-blog.herokuapp.com//post-image', {
             method: 'PUT',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -248,7 +246,7 @@ class Feed extends Component {
                     imagePath: result.filePath,
                 })
 
-                return fetch('http://localhost:3030/graphql', {
+                return fetch('https://mynode-blog.herokuapp.com//graphql', {
                     method: 'POST',
                     body: JSON.stringify(graphqlQuery),
                     headers: {
@@ -300,8 +298,7 @@ class Feed extends Component {
                         updatedPosts[findIndex] = post
                     } else {
                         updatedTotalPosts++
-                        if(prevState.totalPosts.length >= prevState.lastPage){
-
+                        if (prevState.totalPosts.length >= prevState.lastPage) {
                             updatedPosts.pop()
                         }
                         updatedPosts.unshift(post)
@@ -340,7 +337,7 @@ class Feed extends Component {
                 }
             `,
         }
-        fetch('http://localhost:3030/graphql', {
+        fetch('https://mynode-blog.herokuapp.com//graphql', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -439,7 +436,7 @@ class Feed extends Component {
                                         ).toLocaleDateString('en-US')}
                                         title={post.title}
                                         // image={
-                                        //     'http://localhost:3030/' +
+                                        //     'https://mynode-blog.herokuapp.com//' +
                                         //     post.imageUrl
                                         // }
                                         content={post.content}
