@@ -28,7 +28,7 @@ class SinglePost extends Component {
                 }
             }`,
         }
-        fetch('https://mynode-blog.herokuapp.com//graphql', {
+        fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -47,7 +47,7 @@ class SinglePost extends Component {
                     throw new Error('Failed to fetch Post')
                 }
                 let image =
-                    'https://mynode-blog.herokuapp.com//' + fetchedPost.imageUrl
+                    'https://mynode-blog.herokuapp.com/' + fetchedPost.imageUrl
                 this.setState({
                     title: fetchedPost.title,
                     author: fetchedPost.creator.username,

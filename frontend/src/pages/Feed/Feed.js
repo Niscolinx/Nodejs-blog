@@ -30,7 +30,7 @@ class Feed extends Component {
                 }
             }`,
         }
-        fetch('https://mynode-blog.herokuapp.com//graphql', {
+        fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ class Feed extends Component {
                   }
                 }`,
         }
-        fetch('https://mynode-blog.herokuapp.com//graphql', {
+        fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
             body: JSON.stringify(graphqlQuery),
             headers: {
@@ -130,7 +130,7 @@ class Feed extends Component {
                 }
             `,
         }
-        fetch('https://mynode-blog.herokuapp.com//graphql', {
+        fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -186,7 +186,7 @@ class Feed extends Component {
             formData.append('oldImage', this.state.editPost.imagePath)
         }
 
-        fetch('https://mynode-blog.herokuapp.com//post-image', {
+        fetch('https://mynode-blog.herokuapp.com/post-image', {
             method: 'PUT',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -246,7 +246,7 @@ class Feed extends Component {
                     imagePath: result.filePath,
                 })
 
-                return fetch('https://mynode-blog.herokuapp.com//graphql', {
+                return fetch('https://mynode-blog.herokuapp.com/graphql', {
                     method: 'POST',
                     body: JSON.stringify(graphqlQuery),
                     headers: {
@@ -337,7 +337,7 @@ class Feed extends Component {
                 }
             `,
         }
-        fetch('https://mynode-blog.herokuapp.com//graphql', {
+        fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + this.props.token,
@@ -436,7 +436,7 @@ class Feed extends Component {
                                         ).toLocaleDateString('en-US')}
                                         title={post.title}
                                         // image={
-                                        //     'https://mynode-blog.herokuapp.com//' +
+                                        //     'https://mynode-blog.herokuapp.com/' +
                                         //     post.imageUrl
                                         // }
                                         content={post.content}
