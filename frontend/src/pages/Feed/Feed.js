@@ -86,6 +86,7 @@ class Feed extends Component {
         }
         fetch('https://mynode-blog.herokuapp.com/graphql', {
             method: 'POST',
+            method: 'POST',
             body: JSON.stringify(graphqlQuery),
             headers: {
                 'Content-Type': 'application/json',
