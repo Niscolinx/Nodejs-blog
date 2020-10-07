@@ -5,7 +5,7 @@ import Modal from '../Modal/Modal';
 
 const errorHandler = props => (
   <Fragment>
-    {props.error && <Backdrop onClick={props.onHandlee} />}
+    {props.error && <Backdrop onClick={props.onHandle} />}
     {props.error && (
       <Modal
         title="An Error Occurred"
