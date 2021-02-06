@@ -180,8 +180,8 @@ class Feed extends Component {
 
     finishEditHandler = (postData) => {
         const formData = new FormData()
-
         formData.append('image', postData.image)
+
         if (this.state.editPost) {
             formData.append('oldImage', this.state.editPost.imagePath)
         }
